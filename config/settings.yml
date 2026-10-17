@@ -2,3 +2,11 @@ discourse_kuu_ratings:
   kuu_ratings_enabled:
     default: false
     client: true
+  kuu_ratings_board_category:
+    type: category
+    default: ""
+    client: true
+  kuu_ratings_item_category:
+    type: category
+    default: ""
+    client: true

@@ -16,5 +16,20 @@ end
 require_relative "lib/discourse_kuu_ratings/engine"
 
 after_initialize do
-  # 插件的主要逻辑在这里注册（自定义字段、序列化器、事件等）
+  register_topic_custom_field_type(DiscourseKuuRatings::ItemFields::BOARD_TOPIC_ID, :integer)
+  register_topic_custom_field_type(DiscourseKuuRatings::ItemFields::TAGLINE, :string)
+  DiscourseKuuRatings::ItemFields::NAMES.each { |name| register_editable_topic_custom_field(name) }
+
+  # 进审核队列时 core 只保存正文、标签等，不加这一项自定义字段会丢
+  if NewPostManager.plugin_payload_attributes.exclude?(:topic_opts)
+    NewPostManager.add_plugin_payload_attribute(:topic_opts)
+  end
+
+  on(:after_validate_topic) do |topic, creator|
+    DiscourseKuuRatings::ItemFields.validate(topic, creator)
+  end
+
+  on(:approved_post) do |reviewable, post|
+    DiscourseKuuRatings::ItemFields.restore_after_approval(reviewable, post)
+  end
 end

@@ -1,3 +1,11 @@
 en:
   site_settings:
     kuu_ratings_enabled: "Enable KUU ratings (rating boards with multiple items, 0–10 scores and short reviews)."
+    kuu_ratings_board_category: "Category for rating boards. Turn on \"Require moderator approval of all new topics\" for it."
+    kuu_ratings_item_category: "Category for rating items, usually a subcategory of the rating board category. Turn on \"Require moderator approval of all new topics\" for it."
+  kuu_ratings:
+    errors:
+      board_invalid: "Choose an existing, open rating board for this item."
+      tagline_required: "Add a one-line description."
+      tagline_too_long: "The one-line description must be %{count} characters or fewer."
+      image_required: "Add at least one image to the post."

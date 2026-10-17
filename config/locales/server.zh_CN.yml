@@ -1,3 +1,11 @@
 zh_CN:
   site_settings:
     kuu_ratings_enabled: "启用 KUU 评分（评分主题、评分对象、0–10 分打分和短评）。"
+    kuu_ratings_board_category: "放评分主题的分类。这个分类要开启「新话题需要审核」。"
+    kuu_ratings_item_category: "放评分对象的分类，一般是评分分类的子分类。这个分类要开启「新话题需要审核」。"
+  kuu_ratings:
+    errors:
+      board_invalid: "请选择一个已上线、未关闭的评分主题。"
+      tagline_required: "请填写一句话简介。"
+      tagline_too_long: "一句话简介不能超过 %{count} 个字。"
+      image_required: "正文里至少要有一张图片。"
