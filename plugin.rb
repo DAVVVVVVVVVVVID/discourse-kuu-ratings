@@ -37,4 +37,12 @@ after_initialize do
   on(:approved_post) do |reviewable, post|
     DiscourseKuuRatings::ItemFields.restore_after_approval(reviewable, post)
   end
+
+  on(:post_destroyed) do |post|
+    DiscourseKuuRatings::RatingScore::DestroyForDeletedPost.call(params: { post_id: post.id })
+  end
+
+  on(:user_destroyed) do |user|
+    DiscourseKuuRatings::RatingScore::DestroyForDeletedUser.call(params: { user_id: user.id })
+  end
 end
