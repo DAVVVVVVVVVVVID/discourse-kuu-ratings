@@ -27,6 +27,29 @@ after_initialize do
     NewPostManager.add_plugin_payload_attribute(:topic_opts)
   end
 
+  # 评分对象帖子里每条发言旁边显示作者的分数。帖子页一次查出全部，避免每条回帖查一次
+  add_to_class(:topic_view, :kuu_scores_by_user_id) do
+    @kuu_scores_by_user_id ||=
+      DiscourseKuuRatings::RatingScore.where(item_topic_id: topic.id).pluck(:user_id, :score).to_h
+  end
+
+  add_to_serializer(
+    :post,
+    :kuu_score,
+    include_condition: -> do
+      DiscourseKuuRatings::ItemFields.item_category?(object.topic&.category_id)
+    end,
+  ) do
+    if @topic_view
+      @topic_view.kuu_scores_by_user_id[object.user_id]
+    else
+      DiscourseKuuRatings::RatingScore.where(
+        item_topic_id: object.topic_id,
+        user_id: object.user_id,
+      ).pick(:score)
+    end
+  end
+
   # NewPostManager 的 handler 是全局的，插件关闭时由 ReplyRules 自己跳过
   NewPostManager.add_handler(100) { |manager| DiscourseKuuRatings::ReplyRules.check(manager) }
 

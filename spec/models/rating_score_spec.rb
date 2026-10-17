@@ -77,4 +77,60 @@ RSpec.describe DiscourseKuuRatings::RatingScore do
       expect(item_topic.custom_fields).not_to have_key("kuu_score_avg")
     end
   end
+
+  describe ".hot_reviews" do
+    fab!(:other_item, :topic)
+
+    it "returns only liked reviews, most liked first and earlier first on ties" do
+      top = Fabricate(:kuu_review, item_topic:, like_count: 5)
+      earlier_tie =
+        Fabricate(
+          :kuu_review,
+          item_topic:,
+          post: Fabricate(:post, topic: item_topic, like_count: 3, created_at: 2.days.ago),
+        )
+      later_tie =
+        Fabricate(
+          :kuu_review,
+          item_topic:,
+          post: Fabricate(:post, topic: item_topic, like_count: 3, created_at: 1.day.ago),
+        )
+      Fabricate(:kuu_review, item_topic:, like_count: 0)
+      Fabricate(:kuu_rating_score, item_topic:)
+
+      expect(described_class.hot_reviews([item_topic.id], per_item: 10)).to eq(
+        [top, earlier_tie, later_tie],
+      )
+    end
+
+    it "applies the limit to each item separately" do
+      first = Fabricate(:kuu_review, item_topic:, like_count: 5)
+      second = Fabricate(:kuu_review, item_topic:, like_count: 3)
+      Fabricate(:kuu_review, item_topic:, like_count: 1)
+      other_first = Fabricate(:kuu_review, item_topic: other_item, like_count: 2)
+      other_second = Fabricate(:kuu_review, item_topic: other_item, like_count: 1)
+      Fabricate(:kuu_review, item_topic: other_item, like_count: 1)
+
+      expect(described_class.hot_reviews([item_topic.id, other_item.id], per_item: 2)).to eq(
+        [first, second, other_first, other_second],
+      )
+    end
+
+    it "ignores deleted, hidden and whisper reviews" do
+      visible = Fabricate(:kuu_review, item_topic:, like_count: 1)
+      [
+        { deleted_at: 1.hour.ago },
+        { hidden: true },
+        { post_type: Post.types[:whisper] },
+      ].each do |attrs|
+        Fabricate(
+          :kuu_review,
+          item_topic:,
+          post: Fabricate(:post, topic: item_topic, like_count: 5, **attrs),
+        )
+      end
+
+      expect(described_class.hot_reviews([item_topic.id], per_item: 10)).to eq([visible])
+    end
+  end
 end

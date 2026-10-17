@@ -23,6 +23,24 @@ module DiscourseKuuRatings
       stars * POINTS_PER_STAR
     end
 
+    # 每个对象点赞最多的前 per_item 条短评（至少 1 个赞，赞数相同时先发的在前）
+    def self.hot_reviews(item_topic_ids, per_item:)
+      ranked =
+        joins(:post)
+          .where(item_topic_id: item_topic_ids)
+          .where(posts: { deleted_at: nil, hidden: false, post_type: Post.types[:regular] })
+          .where("posts.like_count > 0")
+          .select(
+            "kuu_rating_scores.*",
+            "ROW_NUMBER() OVER (PARTITION BY kuu_rating_scores.item_topic_id ORDER BY posts.like_count DESC, posts.created_at ASC) AS hot_rank",
+          )
+
+      from(ranked, :kuu_rating_scores)
+        .where("hot_rank <= ?", per_item)
+        .order(:item_topic_id, :hot_rank)
+        .includes(post: :user)
+    end
+
     # 必须在事务里调用。先锁住 topic 行，让并发的打分、删除排队，
     # 这样最后一次重算一定能看到所有已提交的打分
     def self.refresh_item_stats(item_topic)
