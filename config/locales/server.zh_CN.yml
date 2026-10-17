@@ -1,14 +1,38 @@
 zh_CN:
   site_settings:
-    kuu_ratings_enabled: "启用 KUU 评分（评分主题、评分对象、0–10 分打分和短评）。"
-    kuu_ratings_board_category: "放评分主题的分类。这个分类要开启「新话题需要审核」。"
-    kuu_ratings_item_category: "放评分对象的分类，一般是评分分类的子分类。这个分类要开启「新话题需要审核」。"
+    kuu_ratings_enabled: "启用 KUU 评分（评分主题、评分对象、五颗星打分和短评）。"
+    kuu_ratings_board_category: "放评分主题的分类。帖子由插件在审核通过后创建，普通用户在这个分类只需要回复权限。"
+    kuu_ratings_item_category: "放评分对象的分类，一般是评分分类的子分类。帖子由插件在审核通过后创建，普通用户在这个分类只需要回复权限。"
   kuu_ratings:
+    board_first_post: "这是一个评分主题，评分对象都列在标题下面。"
     errors:
-      board_invalid: "请选择一个已上线、未关闭的评分主题。"
-      tagline_required: "请填写一句话简介。"
-      tagline_too_long: "一句话简介不能超过 %{count} 个字。"
-      image_required: "正文里至少要有一张图片。"
-      board_closed: "这个评分主题已经关闭，里面的对象不能再打分了。"
-      reply_to_item_not_allowed: "直接回复评分对象必须打分，请用「我来打分」发短评；要回复别人的短评，请点那条短评下面的回复按钮。"
+      board_closed: "这个评分主题已经关闭，不能再打分或添加评分对象了。"
       already_scored: "你已经给这个对象打过分了。想重新打分的话，请先删除原来的打分。"
+      reply_to_item_not_allowed: "直接回复评分对象必须打分，请用「我来打分」发短评；要回复别人的短评，请点那条短评下面的回复按钮。"
+      cannot_submit: "你现在不能提交评分主题或评分对象。"
+      duplicate_names: "评分对象不能重名。"
+      name_taken: "这个评分主题里已经有同名的评分对象了。"
+      image_invalid: "请为每个评分对象上传一张图片。"
+      image_missing: "有图片已经被删除，无法发布。"
+      publish_failed: "发布失败，请稍后再试。"
+  discourse_kuu_ratings:
+    reviewables:
+      actions:
+        approve_kuu_rating_submission:
+          title: "批准"
+          description: "发布这个评分主题（连同所有评分对象）或这个评分对象。"
+        reject_kuu_rating_submission:
+          title: "拒绝"
+          description: "不发布，并私信通知提交人。"
+  system_messages:
+    kuu_rating_submission_rejected:
+      title: "评分内容未通过审核"
+      subject_template: "你提交的评分内容没有通过审核"
+      text_body_template: |
+        你好，
+
+        你提交的「%{name}」没有通过管理员审核，所以不会发布到论坛上。
+
+        评分只收店铺、地点、服务和生活中的各种「概念」，不评具体的人，也不评课程和研究室。图片请用自己拍的，或者确认可以使用的。
+
+        有疑问的话，可以私信管理员。

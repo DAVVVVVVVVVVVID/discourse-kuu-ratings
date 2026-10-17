@@ -9,16 +9,11 @@ module DiscourseKuuRatings
                :slug,
                :url,
                :image_url,
-               :tagline,
                :score_avg,
                :score_count
 
     def url
       object.relative_url
-    end
-
-    def tagline
-      object.custom_fields[ItemFields::TAGLINE]
     end
 
     def score_avg

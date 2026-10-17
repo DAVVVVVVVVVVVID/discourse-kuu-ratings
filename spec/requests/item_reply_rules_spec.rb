@@ -78,16 +78,12 @@ RSpec.describe "Replies in rating items" do
     expect(item_topic.posts.last).to have_attributes(raw: "好吃", reply_to_post_number: nil)
   end
 
-  it "does not affect creating a new rating item" do
+  it "does not affect creating a new topic in the item category" do
     post "/posts.json",
          params: {
            title: "Another ramen shop near campus",
-           raw: "Thin noodles and light broth.\n\n![ramen](https://example.com/ramen.png)",
+           raw: "Thin noodles and light broth, worth a visit.",
            category: item_category.id,
-           topic_custom_fields: {
-             kuu_board_topic_id: board_topic.id,
-             kuu_tagline: "Shio ramen",
-           },
          }
 
     expect(response.status).to eq(200)

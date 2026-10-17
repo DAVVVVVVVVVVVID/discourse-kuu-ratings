@@ -4,7 +4,7 @@ module DiscourseKuuRatings
   # 评分主题下已上线、当前用户看得到的评分对象，按卡片列表的排序方式排好
   class BoardItemsQuery
     MAX_ITEMS = 200
-    CARD_FIELDS = [ItemFields::TAGLINE, RatingScore::AVG_FIELD, RatingScore::COUNT_FIELD].freeze
+    CARD_FIELDS = [RatingScore::AVG_FIELD, RatingScore::COUNT_FIELD].freeze
     AVG_SQL = "NULLIF(kuu_avg.value, '')::numeric"
     COUNT_SQL = "COALESCE(NULLIF(kuu_count.value, '')::integer, 0)"
     ORDERS = {

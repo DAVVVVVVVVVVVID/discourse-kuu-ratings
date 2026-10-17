@@ -8,14 +8,16 @@
 - 本仓库是**公开**的：不要提交任何密钥、服务器地址以外的敏感信息、用户数据
 
 ## 已确定的规则（不要自行改）
-- 一个评分主题里有多个评分对象；评分主题和评分对象都是 topic，分别在「评分」「评分 › 评分对象」分类，靠分类的「新话题需审核」进审核队列
+- 一个评分主题里有多个评分对象；评分主题和评分对象都是 topic，分别在「评分」「评分 › 评分对象」分类
+- 新建评分主题和添加评分对象都用插件自己的表单，不用 Discourse 的发帖框：评分主题只有名称，创建时至少带 2 个评分对象；评分对象只有图片和名称。名称都是 30 字以内，同一个评分主题里对象不能重名
+- 审核用插件自己注册的审核类型：新建评分主题时「主题 + 所有对象」打包成一条，作为整体批准或拒绝；单独添加的对象一个一条。批准后插件才建帖子，首帖内容由插件生成；插件建帖时跳过 Discourse 的标题最短长度和不能重名两条规则
+- 评分主题页不显示首帖，标题下面直接是评分对象横条列表（左图片，名称和第一条热评，右边星星、分数保留 1 位小数、打分人数）
 - 10 分制，像虎扑一样显示五颗星，每颗星 2 分，只能选整颗星：每人对每个评分对象打一次分（2/4/6/8/10），数据库存 10 分制的分数，平均分可以是小数；短评选填；不能修改，只能删除后重打（删除时短评一起删）
 - 短评不经过审核，也不走 core 的回帖长度检查（插件自己限制 1–500 字），但 core 的其他发帖限制照常
 - 评分对象帖子里直接回复对象的都是短评，必须打分；短评可以被回复，回复不用打分
 - 打分不匿名：不写短评的打分也能看到是谁打的；用户在评分对象下的任何发言旁边都显示这个用户的分数
 - 不管从哪里删掉短评，对应的打分都一起删
 - 评分主题关闭或删除后，里面的对象不能再打分；发起人可以给自己添加的对象打分
-- 评分对象必须有：名称（topic 标题）、图片（正文第一张图）、一句话简介（topic custom field）
 - 所有注册用户都能发起和添加；打分人数不设门槛
 - 不评具体的人、课程、研究室
 
@@ -30,9 +32,20 @@
 - 浏览器测试（spec/system）要求容器里有 Playwright 浏览器和它依赖的系统库。容器新建或 Playwright 升级后，报 `Executable doesn't exist` 或 `error while loading shared libraries` 时执行：
   - `d/exec pnpm playwright-install`（下载浏览器）
   - `docker exec -u root -w /src discourse_dev bash -c 'pnpm exec playwright install-deps chromium'`（用 root 装系统库）
+- 改了 `plugin.rb` 之后，开发服务器会自动重载，但可能留下一个孤儿 worker（`ps -eo pid,ppid,args` 里 PPID 为 1 的 `pitchfork ... worker`），它继续用旧代码接请求，现象是页面时好时坏（比如插件样式时有时无）。`docker exec discourse_dev kill <pid>` 结束它，或者重启 `d/dev`
+- 截图脚本登录用的测试账号要先在本地开发库里建好（用户名、密码自己定，不要用真实账号）
 - lint 要在容器里跑：`d/exec bin/lint --fix <文件...>`，路径相对 `~/discourse`
 - `d/` 脚本都用 `docker exec -it`。没有终端时（比如后台运行）会报 `the input device is not a TTY`，要用 `script -qec '命令' /dev/null` 包一层
 - 插件的启用开关是站点设置 `kuu_ratings_enabled`，默认关闭，开发环境要在后台打开
+- 本地开发库装了和线上同一版本的 FKB Pro（GitHub `VaperinaDEV/fkb-pro-theme` 提交 `bc006ce132`，配色 FKB Pro - Light，设为默认，主题设置都是默认值）。因为后台「从 GitHub 安装」只能装最新版，是 checkout 到这个提交后用 `RemoteTheme.import_theme_from_directory` 导入的。恢复原样：本地后台把 Foundation 设为默认
+- 截图检查界面：`script/screenshot.mjs`（用法见文件开头），电脑和手机宽度各一张
+
+## 界面风格（2026-10-17 定）
+- 要和线上的 FKB Pro 主题融洽：白底卡片、浅阴影、圆角，主色是蓝色（`--tertiary`）
+- 插件只用 Discourse 自带的 CSS 变量（`--primary`、`--secondary`、`--tertiary`、`--d-default-border-radius` 等）和 ui-kit 组件，不写死颜色；这样主题换配色、开深色模式时会自动跟着变
+- 星星用金黄色，定义成可覆盖的变量 `--kuu-star-color`
+- 只对 FKB Pro 有效的微调不写进插件，放进 KUU 仓库的「KUU 自定义组件」（`theme/` 目录）
+- 每做完一个页面，截电脑和手机宽度的图给 David 确认后再做下一个
 
 ## 约定
 - Ruby 模块 `DiscourseKuuRatings`，接口挂在 `/kuu-ratings`

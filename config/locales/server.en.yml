@@ -1,14 +1,38 @@
 en:
   site_settings:
-    kuu_ratings_enabled: "Enable KUU ratings (rating boards with multiple items, 0–10 scores and short reviews)."
-    kuu_ratings_board_category: "Category for rating boards. Turn on \"Require moderator approval of all new topics\" for it."
-    kuu_ratings_item_category: "Category for rating items, usually a subcategory of the rating board category. Turn on \"Require moderator approval of all new topics\" for it."
+    kuu_ratings_enabled: "Enable KUU ratings (rating boards with multiple items, five-star scores and short reviews)."
+    kuu_ratings_board_category: "Category for rating boards. The plugin creates the topics after approval, so regular users only need permission to reply here."
+    kuu_ratings_item_category: "Category for rating items, usually a subcategory of the rating board category. The plugin creates the topics after approval, so regular users only need permission to reply here."
   kuu_ratings:
+    board_first_post: "This is a rating board. Its items are listed below the title."
     errors:
-      board_invalid: "Choose an existing, open rating board for this item."
-      tagline_required: "Add a one-line description."
-      tagline_too_long: "The one-line description must be %{count} characters or fewer."
-      image_required: "Add at least one image to the post."
-      board_closed: "This rating board is closed, so its items can no longer be scored."
-      reply_to_item_not_allowed: "Replies to a rating item must come with a score. Use \"Rate it\" to post a short review, or use the reply button on someone's review to answer it."
+      board_closed: "This rating board is closed, so it no longer accepts scores or new items."
       already_scored: "You have already scored this item. Delete your score first if you want to score again."
+      reply_to_item_not_allowed: "Replies to a rating item must come with a score. Use \"Rate it\" to post a short review, or use the reply button on someone's review to answer it."
+      cannot_submit: "You can't submit rating boards or items right now."
+      duplicate_names: "Rating items can't have the same name."
+      name_taken: "This rating board already has an item with that name."
+      image_invalid: "Upload one image for each rating item."
+      image_missing: "An image has been deleted, so this can't be published."
+      publish_failed: "Publishing failed. Please try again later."
+  discourse_kuu_ratings:
+    reviewables:
+      actions:
+        approve_kuu_rating_submission:
+          title: "Approve"
+          description: "Publish this rating board (with all its items) or this rating item."
+        reject_kuu_rating_submission:
+          title: "Reject"
+          description: "Don't publish it, and send the submitter a message."
+  system_messages:
+    kuu_rating_submission_rejected:
+      title: "Rating submission not approved"
+      subject_template: "Your rating submission was not approved"
+      text_body_template: |
+        Hi,
+
+        Your submission "%{name}" was not approved by the moderators, so it won't be published on the forum.
+
+        Ratings are only for shops, places, services and everyday "concepts" — not for specific people, courses or labs. Please use images you took yourself or have permission to use.
+
+        If you have questions, send a message to the moderators.
