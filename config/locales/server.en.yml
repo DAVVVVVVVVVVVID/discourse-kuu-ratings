@@ -10,4 +10,5 @@ en:
       tagline_too_long: "The one-line description must be %{count} characters or fewer."
       image_required: "Add at least one image to the post."
       board_closed: "This rating board is closed, so its items can no longer be scored."
+      reply_to_item_not_allowed: "Replies to a rating item must come with a score. Use \"Rate it\" to post a short review, or use the reply button on someone's review to answer it."
       already_scored: "You have already scored this item. Delete your score first if you want to score again."

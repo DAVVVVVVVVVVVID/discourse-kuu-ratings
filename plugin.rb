@@ -27,6 +27,9 @@ after_initialize do
     NewPostManager.add_plugin_payload_attribute(:topic_opts)
   end
 
+  # NewPostManager 的 handler 是全局的，插件关闭时由 ReplyRules 自己跳过
+  NewPostManager.add_handler(100) { |manager| DiscourseKuuRatings::ReplyRules.check(manager) }
+
   on(:after_validate_topic) do |topic, creator|
     DiscourseKuuRatings::ItemFields.validate(topic, creator)
   end
