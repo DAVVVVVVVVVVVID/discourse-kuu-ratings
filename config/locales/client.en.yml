@@ -5,4 +5,83 @@ en:
         categories:
           discourse_kuu_ratings: "KUU Ratings"
   js:
-    kuu_ratings: {}
+    review:
+      types:
+        reviewable_kuu_rating_submission:
+          title: "Rating submission"
+          noun: "rating submission"
+    kuu_ratings:
+      reviewable:
+        new_board: "New rating board"
+        add_to_board: "Adding to rating board"
+        items:
+          one: "Rating items (%{count})"
+          other: "Rating items (%{count})"
+        image_missing: "The image has been deleted"
+      submitted: "Submitted. It will be published, and you'll be notified, once a moderator approves it"
+      review_hint: "A moderator will review it before it's published"
+      new_topic_choice:
+        title: "What would you like to post?"
+        topic: "Topic"
+        topic_description: "Start a discussion, ask a question or share something"
+        board: "Rating board"
+        board_description: "List a few items for everyone to rate and review"
+      board_form:
+        title: "New rating board"
+        name: "Board name"
+        name_placeholder: "e.g. Ramen shops near Kyoto University"
+        items: "Rating items"
+        items_hint: "At least %{min}, at most %{max}"
+        add_item: "Add another item"
+        remove_item: "Remove this item"
+        duplicate_name: "Another item has the same name"
+        submit: "Submit for review"
+      item_form:
+        image: "Image"
+        name: "Name"
+        numbered_name: "Item %{number}"
+        name_placeholder: "Name of the item"
+      stars:
+        label: "%{score} out of 10"
+        count:
+          one: "%{count} star"
+          other: "%{count} stars"
+      distribution: "Rating distribution"
+      hot_reviews: "Top reviews"
+      view_post: "View this review"
+      score:
+        title: "Rate it"
+        start: "Rate it"
+        pick: "Tap a star to rate"
+        star_option:
+          one: "%{count} star (%{score} points)"
+          other: "%{count} stars (%{score} points)"
+        points: "%{score} points"
+        stars: "Stars"
+        comment: "Review"
+        comment_placeholder: "Share your experience (optional)"
+        submit: "Submit"
+        mine: "You rated it %{score}"
+        delete: "Delete my rating"
+        delete_confirm: "Delete your rating? Your review will be deleted too. You can rate it again afterwards."
+        login_to_score: "Log in to rate it"
+        closed: "This item can no longer be rated"
+        cannot_score: "You can't rate this item right now"
+        post_score: "Rated this item %{score}"
+      board:
+        items_title: "Rating items"
+        sort_label: "Sort by"
+        sorts:
+          score: "Top rated"
+          count: "Most rated"
+          latest: "Newest"
+        score_count:
+          one: "%{count} rating"
+          other: "%{count} ratings"
+        no_scores: "No ratings yet"
+        empty: "No rating items yet"
+      add_item:
+        button: "Add an item"
+        title: "Add a rating item"
+        board: "Adding to: %{title}"
+        submit: "Submit for review"

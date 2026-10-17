@@ -16,8 +16,10 @@ async function logIn(context) {
     headers: { ...xhr, "X-CSRF-Token": csrf },
     form: { login: username, password },
   });
-  if ((await response.json()).error) {
-    throw new Error(`login failed for ${username}`);
+  // 登录太频繁时返回 429，错误在 errors 里而不是 error
+  const body = await response.json();
+  if (!response.ok() || body.error || body.errors) {
+    throw new Error(`login failed for ${username}: ${JSON.stringify(body)}`);
   }
 }
 

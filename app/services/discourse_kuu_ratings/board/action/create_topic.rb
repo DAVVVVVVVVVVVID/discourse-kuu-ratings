@@ -11,7 +11,8 @@ module DiscourseKuuRatings
       PostCreator.create!(
         user,
         title:,
-        raw: I18n.with_locale(SiteSetting.default_locale) { I18n.t("kuu_ratings.board_first_post") },
+        raw:
+          I18n.with_locale(SiteSetting.default_locale) { I18n.t("kuu_ratings.board_first_post") },
         category: ItemFields.board_category_id,
         skip_validations: true,
       ).topic

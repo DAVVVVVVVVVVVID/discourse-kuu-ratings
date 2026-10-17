@@ -90,9 +90,7 @@ class ReviewableKuuRatingSubmission < Reviewable
     service = new_board? ? DiscourseKuuRatings::Board::Publish : DiscourseKuuRatings::Item::Publish
     result = service.call(params: { reviewable_id: id }, guardian: performed_by.guardian)
 
-    if result.failure?
-      return create_result(:failure) { |r| r.errors = publish_errors(result) }
-    end
+    return create_result(:failure) { |r| r.errors = publish_errors(result) } if result.failure?
 
     self.target = new_board? ? result[:board_topic] : result[:item_topic]
     save!
@@ -118,9 +116,12 @@ class ReviewableKuuRatingSubmission < Reviewable
   end
 
   def publish_errors(result)
-    failed = PUBLISH_FAILURE_MESSAGES.find { |policy, _| result["result.policy.#{policy}"]&.failure? }
-    ActiveModel::Errors.new(self).tap do |errors|
-      errors.add(:base, I18n.t(failed&.last || "kuu_ratings.errors.publish_failed"))
-    end
+    failed =
+      PUBLISH_FAILURE_MESSAGES.find { |policy, _| result["result.policy.#{policy}"]&.failure? }
+    ActiveModel::Errors
+      .new(self)
+      .tap do |errors|
+        errors.add(:base, I18n.t(failed&.last || "kuu_ratings.errors.publish_failed"))
+      end
   end
 end

@@ -5,4 +5,79 @@ zh_CN:
         categories:
           discourse_kuu_ratings: "KUU 评分"
   js:
-    kuu_ratings: {}
+    review:
+      types:
+        reviewable_kuu_rating_submission:
+          title: "评分投稿"
+          noun: "评分投稿"
+    kuu_ratings:
+      reviewable:
+        new_board: "新建评分主题"
+        add_to_board: "添加到评分主题"
+        items:
+          other: "评分对象（%{count} 个）"
+        image_missing: "图片已被删除"
+      submitted: "已提交，管理员审核通过后会发布并通知你"
+      review_hint: "提交后由管理员审核，通过后发布"
+      new_topic_choice:
+        title: "你想发布什么？"
+        topic: "话题"
+        topic_description: "发起讨论、提问或分享"
+        board: "评分主题"
+        board_description: "列出几个对象，让大家打分和点评"
+      board_form:
+        title: "新建评分主题"
+        name: "评分主题名称"
+        name_placeholder: "比如：京大周边的拉面店"
+        items: "评分对象"
+        items_hint: "至少 %{min} 个，最多 %{max} 个"
+        add_item: "再加一个评分对象"
+        remove_item: "删除这个评分对象"
+        duplicate_name: "和其他评分对象重名了"
+        submit: "提交审核"
+      item_form:
+        image: "图片"
+        name: "名称"
+        numbered_name: "评分对象 %{number}"
+        name_placeholder: "评分对象的名称"
+      stars:
+        label: "%{score} 分（满分 10 分）"
+        count:
+          other: "%{count} 星"
+      distribution: "星级分布"
+      hot_reviews: "热评"
+      view_post: "查看这条短评"
+      score:
+        title: "我来打分"
+        start: "我来打分"
+        pick: "点星星打分"
+        star_option:
+          other: "%{count} 颗星（%{score} 分）"
+        points: "%{score} 分"
+        stars: "星级"
+        comment: "短评"
+        comment_placeholder: "说说你的体验（选填）"
+        submit: "提交"
+        mine: "你打了 %{score} 分"
+        delete: "删除我的打分"
+        delete_confirm: "确定删除你的打分吗？你的短评也会一起删除。删除后可以重新打分。"
+        login_to_score: "登录后就可以打分"
+        closed: "这个评分对象已经不能再打分了"
+        cannot_score: "你现在不能给这个评分对象打分"
+        post_score: "给这个评分对象打了 %{score} 分"
+      board:
+        items_title: "评分对象"
+        sort_label: "排序"
+        sorts:
+          score: "评分最高"
+          count: "评分人数"
+          latest: "最新添加"
+        score_count:
+          other: "%{count} 人评分"
+        no_scores: "暂无评分"
+        empty: "还没有评分对象"
+      add_item:
+        button: "添加评分对象"
+        title: "添加评分对象"
+        board: "添加到：%{title}"
+        submit: "提交审核"

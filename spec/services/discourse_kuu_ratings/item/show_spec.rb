@@ -49,14 +49,93 @@ RSpec.describe DiscourseKuuRatings::Item::Show do
       it { is_expected.to fail_a_policy(:can_see_item) }
     end
 
+    context "when the board has been deleted" do
+      before { board_topic.trash! }
+
+      it { is_expected.to run_successfully }
+
+      it "has no board and does not accept scores" do
+        expect(result.board_topic).to be_nil
+        expect(result.accepts_scores).to eq(false)
+        expect(result.can_score).to eq(false)
+      end
+    end
+
+    context "when the board topic is no longer in the board category" do
+      before { board_topic.update!(category: Fabricate(:category)) }
+
+      it "has no board and does not accept scores" do
+        expect(result.board_topic).to be_nil
+        expect(result.accepts_scores).to eq(false)
+      end
+    end
+
+    context "when the user cannot see the board" do
+      before do
+        board_topic.update!(category: Fabricate(:private_category, group: Fabricate(:group)))
+        SiteSetting.kuu_ratings_board_category = board_topic.category_id
+      end
+
+      it "has no board and does not accept scores" do
+        expect(result.board_topic).to be_nil
+        expect(result.accepts_scores).to eq(false)
+      end
+    end
+
+    context "when the board is closed" do
+      before { board_topic.update!(closed: true) }
+
+      it "still links the board but does not accept scores" do
+        expect(result.board_topic).to eq(board_topic)
+        expect(result.accepts_scores).to eq(false)
+        expect(result.can_score).to eq(false)
+      end
+    end
+
+    context "when the item is closed" do
+      before { item_topic.update!(closed: true) }
+
+      it "does not accept scores" do
+        expect(result.accepts_scores).to eq(false)
+        expect(result.can_score).to eq(false)
+      end
+    end
+
+    context "when the item is unlisted" do
+      before { item_topic.update!(visible: false) }
+
+      it "does not accept scores" do
+        expect(result.accepts_scores).to eq(false)
+      end
+    end
+
     # 游客没有可以 fabricate 的用户，只能换 guardian
     context "when not logged in" do
       let(:dependencies) { { guardian: Guardian.new } }
 
       it { is_expected.to run_successfully }
 
-      it "has no score of the viewer" do
+      it "accepts scores but not from the viewer" do
+        expect(result.accepts_scores).to eq(true)
+        expect(result.can_score).to eq(false)
         expect(result.my_rating_score).to be_nil
+      end
+    end
+
+    context "when the user is suspended" do
+      fab!(:user) { Fabricate(:user, suspended_at: 1.day.ago, suspended_till: 1.year.from_now) }
+
+      it "does not let the user score" do
+        expect(result.accepts_scores).to eq(true)
+        expect(result.can_score).to eq(false)
+      end
+    end
+
+    context "when the user is silenced" do
+      fab!(:user) { Fabricate(:user, silenced_till: 1.year.from_now) }
+
+      it "does not let the user score" do
+        expect(result.can_score).to eq(false)
       end
     end
 
@@ -74,6 +153,15 @@ RSpec.describe DiscourseKuuRatings::Item::Show do
 
     context "when everything's ok" do
       it { is_expected.to run_successfully }
+
+      it "returns the board of the item" do
+        expect(result.board_topic).to eq(board_topic)
+      end
+
+      it "lets the user score" do
+        expect(result.accepts_scores).to eq(true)
+        expect(result.can_score).to eq(true)
+      end
 
       it "counts the scores by stars" do
         expect(result.star_counts).to eq(1 => 1, 3 => 1, 4 => 1, 5 => 2)

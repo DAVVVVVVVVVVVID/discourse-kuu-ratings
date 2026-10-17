@@ -8,8 +8,6 @@ class ReviewableKuuRatingSubmissionSerializer < ReviewableSerializer
 
   def items
     uploads = Upload.where(id: object.upload_ids).index_by(&:id)
-    object.items.map do |item|
-      { name: item["name"], image_url: uploads[item["upload_id"]]&.url }
-    end
+    object.items.map { |item| { name: item["name"], image_url: uploads[item["upload_id"]]&.url } }
   end
 end

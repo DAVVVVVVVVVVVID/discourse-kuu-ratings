@@ -11,9 +11,7 @@ module DiscourseKuuRatings
 
     def create
       Board::Submit.call(service_params) do
-        on_success do |submission:|
-          render json: { reviewable_id: submission.id }, status: :created
-        end
+        on_success { |submission:| render json: { reviewable_id: submission.id }, status: :created }
         on_failed_contract do |contract|
           render json: failed_json.merge(errors: contract.errors.full_messages),
                  status: :bad_request
@@ -23,7 +21,9 @@ module DiscourseKuuRatings
         on_failed_policy(:submitter_is_active) do |policy|
           render_json_error(policy.reason, status: 403)
         end
-        on_failed_policy(:no_blocked_words) { |policy| render_json_error(policy.reason, status: 422) }
+        on_failed_policy(:no_blocked_words) do |policy|
+          render_json_error(policy.reason, status: 422)
+        end
         on_model_not_found(:uploads) do
           render_json_error(I18n.t("kuu_ratings.errors.image_invalid"), status: 422)
         end

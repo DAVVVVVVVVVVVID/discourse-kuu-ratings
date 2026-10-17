@@ -9,6 +9,7 @@
 
 enabled_site_setting :kuu_ratings_enabled
 
+register_asset "stylesheets/common/kuu-ratings.scss"
 
 module ::DiscourseKuuRatings
   PLUGIN_NAME = "discourse-kuu-ratings"
@@ -48,6 +49,10 @@ after_initialize do
 
   # NewPostManager 的 handler 是全局的，插件关闭时由 ReplyRules 自己跳过
   NewPostManager.add_handler(100) { |manager| DiscourseKuuRatings::ReplyRules.check(manager) }
+
+  TopicQuery.add_custom_filter(:kuu_ratings_hide_items) do |results, topic_query|
+    DiscourseKuuRatings::TopicListFilter.call(results, topic_query)
+  end
 
   on(:post_destroyed) do |post|
     DiscourseKuuRatings::RatingScore::DestroyForDeletedPost.call(params: { post_id: post.id })

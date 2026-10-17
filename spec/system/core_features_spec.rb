@@ -11,5 +11,6 @@
 RSpec.describe "Core features" do
   before { enable_current_plugin }
 
-  it_behaves_like "having working core features"
+  # 「新建话题」先弹出选择框（普通话题还是评分主题），由 create_rating_board_spec 覆盖
+  it_behaves_like "having working core features", skip_examples: %i[topics:create]
 end

@@ -32,7 +32,9 @@
 - 浏览器测试（spec/system）要求容器里有 Playwright 浏览器和它依赖的系统库。容器新建或 Playwright 升级后，报 `Executable doesn't exist` 或 `error while loading shared libraries` 时执行：
   - `d/exec pnpm playwright-install`（下载浏览器）
   - `docker exec -u root -w /src discourse_dev bash -c 'pnpm exec playwright install-deps chromium'`（用 root 装系统库）
+- 测试环境的样式表只在第一次跑 system spec 时算一次版本号，之后改了 SCSS 也不会重新编译（现象：system spec 里插件样式是旧的或缺失，比如首帖没隐藏）。改完样式要删掉缓存：`rm -f ~/discourse/tmp/cache/assets/test/stylesheet-manifest-test_* && rm -rf ~/discourse/tmp/stylesheet-cache/test_*`
 - 改了 `plugin.rb` 之后，开发服务器会自动重载，但可能留下一个孤儿 worker（`ps -eo pid,ppid,args` 里 PPID 为 1 的 `pitchfork ... worker`），它继续用旧代码接请求，现象是页面时好时坏（比如插件样式时有时无）。`docker exec discourse_dev kill <pid>` 结束它，或者重启 `d/dev`
+- 开发服务器重载代码（比如改了 `lib/` 下的文件）之后，插件在 `after_initialize` 里注册到 core 的东西可能从 web 进程里丢失，但 `rails runner` 里一切正常。见过的现象：审核队列看不到「评分投稿」、按类型筛选报 400 `invalid_parameters: type`；「最新」里又出现评分对象（`TopicQuery.add_custom_filter` 丢了）。重启 `d/dev` 就好，线上不受影响
 - 截图脚本登录用的测试账号要先在本地开发库里建好（用户名、密码自己定，不要用真实账号）
 - lint 要在容器里跑：`d/exec bin/lint --fix <文件...>`，路径相对 `~/discourse`
 - `d/` 脚本都用 `docker exec -it`。没有终端时（比如后台运行）会报 `the input device is not a TTY`，要用 `script -qec '命令' /dev/null` 包一层

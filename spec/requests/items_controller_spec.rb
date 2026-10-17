@@ -147,6 +147,50 @@ RSpec.describe DiscourseKuuRatings::ItemsController do
       expect(response.parsed_body["hot_reviews"].map { |hot| hot["post_id"] }).to eq(
         [review.post_id],
       )
+      expect(response.parsed_body).to include(
+        "board" => {
+          "id" => board_topic.id,
+          "title" => board_topic.title,
+          "url" => board_topic.relative_url,
+        },
+        "accepts_scores" => true,
+        "can_score" => false,
+      )
+    end
+
+    context "when a logged in user views the item" do
+      before { sign_in(user) }
+
+      it "says the user can score" do
+        get item_path
+
+        expect(response.parsed_body).to include("accepts_scores" => true, "can_score" => true)
+      end
+    end
+
+    context "when the board is closed" do
+      before do
+        board_topic.update!(closed: true)
+        sign_in(user)
+      end
+
+      it "still links the board but does not accept scores" do
+        get item_path
+
+        expect(response.parsed_body["board"]).to include("id" => board_topic.id)
+        expect(response.parsed_body).to include("accepts_scores" => false, "can_score" => false)
+      end
+    end
+
+    context "when the board has been deleted" do
+      before { board_topic.trash! }
+
+      it "leaves out the board and does not accept scores" do
+        get item_path
+
+        expect(response.parsed_body).not_to have_key("board")
+        expect(response.parsed_body).to include("accepts_scores" => false, "can_score" => false)
+      end
     end
 
     context "when the user has scored the item" do

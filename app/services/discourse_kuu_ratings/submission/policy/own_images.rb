@@ -8,7 +8,8 @@ module DiscourseKuuRatings
     def call
       uploads.size == params.upload_ids.uniq.size &&
         uploads.all? do |upload|
-          upload.user_id == guardian.user.id && FileHelper.is_supported_image?(upload.original_filename)
+          upload.user_id == guardian.user.id &&
+            FileHelper.is_supported_image?(upload.original_filename)
         end
     end
 

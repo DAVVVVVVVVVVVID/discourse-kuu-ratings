@@ -1,0 +1,632 @@
+// 主题可以覆盖这些变量来配合自己的风格
+:root {
+  --kuu-star-color: #f5b301;
+  --kuu-card-shadow: var(--shadow-card);
+}
+
+// 评分主题的首帖只有插件生成的固定文字，评分对象的首帖只有那张图，都由插件的内容代替
+body.kuu-board-topic,
+body.kuu-item-topic {
+  .topic-post[data-post-number="1"] {
+    display: none;
+  }
+}
+
+// 评分对象页底部用「我来打分」代替「回复」
+body.kuu-item-topic .topic-footer-main-buttons .create {
+  display: none;
+}
+
+.kuu-board-items {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-4);
+  background: var(--secondary);
+  border-radius: var(--d-default-border-radius);
+  box-shadow: var(--kuu-card-shadow);
+
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    align-items: center;
+    margin-bottom: var(--space-3);
+  }
+
+  &__title {
+    margin: 0;
+    font-size: var(--font-up-1);
+  }
+
+  &__sorts {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+
+  &__sort {
+    padding: var(--space-1) var(--space-2);
+    color: var(--primary-medium);
+
+    &.--active {
+      color: var(--tertiary);
+      font-weight: bold;
+    }
+  }
+
+  &__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__empty {
+    margin: var(--space-4) 0;
+    color: var(--primary-medium);
+    text-align: center;
+  }
+
+  // 窄屏：第一行标题和添加按钮，排序单独一行
+  @media (width <= 40rem) {
+    &__header {
+      justify-content: space-between;
+    }
+
+    &__sorts {
+      flex-basis: 100%;
+      order: 1;
+    }
+  }
+}
+
+.kuu-board-item {
+  border-top: 1px solid var(--primary-low);
+
+  &__link {
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 1fr) auto;
+    gap: var(--space-3);
+    align-items: center;
+    padding: var(--space-3) var(--space-1);
+    color: var(--primary);
+
+    &:hover,
+    &:focus-visible {
+      background: var(--primary-very-low);
+      color: var(--primary);
+    }
+  }
+
+  &__image {
+    display: block;
+    width: 4rem;
+    height: 4rem;
+    object-fit: cover;
+    border-radius: var(--d-default-border-radius);
+
+    &.--placeholder {
+      background: var(--primary-very-low);
+    }
+  }
+
+  &__main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+
+  &__name {
+    display: -webkit-box;
+    overflow: hidden;
+    font-weight: bold;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  &__review {
+    overflow: hidden;
+    color: var(--primary-medium);
+    font-size: var(--font-down-1);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__review-user {
+    margin-right: var(--space-1);
+    color: var(--primary-high);
+  }
+
+  &__score {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 0 var(--space-2);
+    align-items: center;
+    justify-items: end;
+    text-align: right;
+  }
+
+  &__score-value {
+    color: var(--primary);
+    font-size: var(--font-up-2);
+    font-weight: bold;
+    line-height: 1;
+  }
+
+  &__score-count {
+    grid-column: 1 / -1;
+    color: var(--primary-medium);
+    font-size: var(--font-down-1);
+  }
+
+  &__no-score {
+    grid-column: 1 / -1;
+    color: var(--primary-medium);
+    font-size: var(--font-down-1);
+  }
+
+  @media (width <= 40rem) {
+    &__link {
+      grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+      gap: var(--space-2);
+    }
+
+    &__image {
+      width: 3.5rem;
+      height: 3.5rem;
+    }
+
+    &__score .kuu-star-rating {
+      font-size: var(--font-down-2);
+    }
+
+    &__score-value {
+      font-size: var(--font-up-1);
+    }
+  }
+}
+
+.kuu-star-rating {
+  position: relative;
+  display: inline-block;
+  color: var(--primary-low-mid);
+  line-height: 1;
+  white-space: nowrap;
+
+  &__filled {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    color: var(--kuu-star-color);
+  }
+
+  // 图标颜色要直接写在 .d-icon 上：帖子元信息、按钮等地方的样式会单独给图标上色
+  .kuu-star-rating__empty .d-icon {
+    color: var(--primary-low-mid);
+  }
+
+  .kuu-star-rating__filled .d-icon {
+    color: var(--kuu-star-color);
+  }
+
+  .d-icon + .d-icon {
+    margin-left: 0.1em;
+  }
+}
+
+.kuu-new-topic-choice {
+  &__options {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  &__option {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+    padding: var(--space-4);
+    text-align: left;
+    white-space: normal;
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    margin-top: 0.15em;
+    color: var(--tertiary);
+    font-size: var(--font-up-2);
+  }
+
+  &__option.--board &__icon {
+    color: var(--kuu-star-color);
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  &__label {
+    color: var(--primary);
+    font-weight: bold;
+  }
+
+  &__description {
+    color: var(--primary-medium);
+    font-size: var(--font-down-1);
+  }
+}
+
+.kuu-new-board-form {
+  width: 100%;
+
+  &__items {
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    gap: var(--space-3);
+  }
+
+  &__items-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: baseline;
+  }
+
+  &__items-title {
+    font-weight: bold;
+  }
+
+  &__items-hint {
+    color: var(--primary-medium);
+    font-size: var(--font-down-1);
+  }
+
+  &__items .form-kit__collection {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    width: 100%;
+  }
+
+  &__add {
+    align-self: flex-start;
+  }
+}
+
+.kuu-add-item-form {
+  width: 100%;
+
+  .kuu-item-fields {
+    align-self: stretch;
+  }
+}
+
+.kuu-new-board-modal__review-hint,
+.kuu-add-item-modal__review-hint {
+  color: var(--primary-medium);
+  font-size: var(--font-down-1);
+}
+
+.kuu-item-fields {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: start;
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--space-3);
+  border: 1px solid var(--primary-low);
+  border-radius: var(--d-default-border-radius);
+
+  &__image,
+  &__name {
+    min-width: 0;
+    margin: 0;
+  }
+
+  &__uploader .file-uploader__preview,
+  &__uploader .file-uploader__preview:has(.lightbox) {
+    width: 7rem;
+    height: 7rem;
+  }
+
+  &__uploader .file-uploader__controls {
+    font-size: var(--font-down-1);
+    text-align: center;
+  }
+}
+
+.kuu-reviewable-submission {
+  &__board-title {
+    font-weight: bold;
+  }
+
+  &__items-title {
+    margin-bottom: var(--space-2);
+    color: var(--primary-high);
+    font-weight: bold;
+  }
+
+  &__items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+
+  &__image-link {
+    display: block;
+  }
+
+  &__image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: var(--d-default-border-radius);
+    background: var(--primary-very-low);
+
+    &.--missing {
+      border: 1px dashed var(--danger);
+    }
+  }
+
+  &__name {
+    overflow-wrap: anywhere;
+  }
+}
+
+.kuu-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+
+  &__board {
+    display: inline-flex;
+    gap: var(--space-1);
+    align-items: center;
+    align-self: flex-start;
+    color: var(--primary-high);
+  }
+
+  &__summary {
+    display: grid;
+    grid-template-columns: 8rem auto minmax(0, 1fr);
+    gap: var(--space-4);
+    align-items: center;
+    padding: var(--space-4);
+    background: var(--secondary);
+    border-radius: var(--d-default-border-radius);
+    box-shadow: var(--kuu-card-shadow);
+  }
+
+  &__image {
+    display: block;
+    width: 8rem;
+    height: 8rem;
+    object-fit: cover;
+    border-radius: var(--d-default-border-radius);
+  }
+
+  &__score {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    align-items: center;
+  }
+
+  &__score-value {
+    color: var(--primary);
+    font-size: var(--font-up-5);
+    font-weight: bold;
+    line-height: 1;
+  }
+
+  &__score-count,
+  &__no-score {
+    color: var(--primary-medium);
+    font-size: var(--font-down-1);
+  }
+
+  &__distribution {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__distribution-row {
+    display: grid;
+    grid-template-columns: 2.5em minmax(0, 1fr) 2em;
+    gap: var(--space-2);
+    align-items: center;
+    color: var(--primary-medium);
+    font-size: var(--font-down-1);
+  }
+
+  &__distribution-track {
+    height: 0.5em;
+    overflow: hidden;
+    background: var(--primary-very-low);
+    border-radius: 0.25em;
+  }
+
+  &__distribution-bar {
+    display: block;
+    height: 100%;
+    background: var(--kuu-star-color);
+  }
+
+  &__distribution-count {
+    text-align: right;
+  }
+
+  @media (width <= 40rem) {
+    &__summary {
+      grid-template-columns: 6rem minmax(0, 1fr);
+    }
+
+    &__image {
+      width: 6rem;
+      height: 6rem;
+    }
+
+    &__distribution {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+.kuu-score-panel,
+.kuu-hot-reviews {
+  padding: var(--space-4);
+  background: var(--secondary);
+  border-radius: var(--d-default-border-radius);
+  box-shadow: var(--kuu-card-shadow);
+
+  &__title {
+    margin: 0 0 var(--space-3);
+    font-size: var(--font-up-1);
+  }
+}
+
+.kuu-score-panel {
+  &__mine,
+  &__notice {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-3);
+    align-items: center;
+    margin: 0;
+  }
+
+  &__notice {
+    color: var(--primary-medium);
+  }
+
+  &__mine-text {
+    font-weight: bold;
+  }
+
+  &__error {
+    margin-bottom: var(--space-3);
+  }
+
+  &__form {
+    width: 100%;
+  }
+}
+
+.kuu-star-input {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+
+  &__stars {
+    display: flex;
+  }
+
+  // 按钮悬停、获得焦点时 core 会改图标颜色，这里固定成灰色或金色
+  .btn.kuu-star-input__star {
+    padding: var(--space-1);
+    font-size: var(--font-up-3);
+
+    &,
+    &:hover,
+    &:focus,
+    &:active {
+      .d-icon {
+        color: var(--primary-low-mid);
+      }
+    }
+
+    &.--lit,
+    &.--lit:hover,
+    &.--lit:focus,
+    &.--lit:active {
+      .d-icon {
+        color: var(--kuu-star-color);
+      }
+    }
+  }
+
+  &__label {
+    color: var(--primary-high);
+    font-weight: bold;
+  }
+}
+
+.kuu-hot-reviews__list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.kuu-hot-review {
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--primary-low);
+
+  &:first-child {
+    padding-top: 0;
+    border-top: none;
+  }
+
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: center;
+  }
+
+  &__username {
+    font-weight: bold;
+  }
+
+  &__likes {
+    display: inline-flex;
+    gap: var(--space-1);
+    align-items: center;
+    margin-left: auto;
+    color: var(--primary-medium);
+
+    .d-icon {
+      color: var(--love);
+    }
+  }
+
+  &__body {
+    margin-top: var(--space-2);
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.kuu-post-score {
+  display: inline-flex;
+  align-items: center;
+  margin-left: var(--space-2);
+  font-size: var(--font-down-2);
+}
