@@ -37,7 +37,7 @@ module DiscourseKuuRatings
       fields = from_creator_opts(creator.opts)
       errors = topic.errors
 
-      if !valid_board?(fields[BOARD_TOPIC_ID], creator.guardian)
+      if !open_board?(fields[BOARD_TOPIC_ID], creator.guardian)
         errors.add(:base, I18n.t("kuu_ratings.errors.board_invalid"))
       end
 
@@ -66,7 +66,7 @@ module DiscourseKuuRatings
       topic.save_custom_fields
     end
 
-    def self.valid_board?(board_topic_id, guardian)
+    def self.open_board?(board_topic_id, guardian)
       return false if board_category_id <= 0 || board_topic_id.to_i <= 0
 
       board =

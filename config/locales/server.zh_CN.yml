@@ -9,3 +9,5 @@ zh_CN:
       tagline_required: "请填写一句话简介。"
       tagline_too_long: "一句话简介不能超过 %{count} 个字。"
       image_required: "正文里至少要有一张图片。"
+      board_closed: "这个评分主题已经关闭，里面的对象不能再打分了。"
+      already_scored: "你已经给这个对象打过分了。想重新打分的话，请先删除原来的打分。"

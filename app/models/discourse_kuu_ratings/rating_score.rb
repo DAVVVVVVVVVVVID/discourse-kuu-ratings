@@ -4,21 +4,35 @@ module DiscourseKuuRatings
   class RatingScore < ActiveRecord::Base
     self.table_name = "kuu_rating_scores"
 
-    MIN_SCORE = 0
-    MAX_SCORE = 10
+    # 10 分制，界面是五颗星，每颗 2 分，只能选整颗星
+    MAX_STARS = 5
+    POINTS_PER_STAR = 2
+    VALID_SCORES = (1..MAX_STARS).map { |stars| stars * POINTS_PER_STAR }.freeze
+    COMMENT_MAX_LENGTH = 500
+    AVG_FIELD = "kuu_score_avg"
+    COUNT_FIELD = "kuu_score_count"
 
-    belongs_to :item_topic, class_name: "Topic"
+    belongs_to :item_topic, -> { with_deleted }, class_name: "Topic"
     belongs_to :user
     belongs_to :post, optional: true
 
-    validates :score,
-              presence: true,
-              numericality: {
-                only_integer: true,
-                greater_than_or_equal_to: MIN_SCORE,
-                less_than_or_equal_to: MAX_SCORE,
-              }
+    validates :score, inclusion: { in: VALID_SCORES }
     validates :user_id, uniqueness: { scope: :item_topic_id }
+
+    def self.score_for_stars(stars)
+      stars * POINTS_PER_STAR
+    end
+
+    # 必须在事务里调用。先锁住 topic 行，让并发的打分、删除排队，
+    # 这样最后一次重算一定能看到所有已提交的打分
+    def self.refresh_item_stats(item_topic)
+      Topic.where(id: item_topic.id).lock.pluck(:id)
+      count, avg = where(item_topic:).pick(Arel.sql("COUNT(*)"), Arel.sql("AVG(score)"))
+
+      item_topic.custom_fields[COUNT_FIELD] = count
+      item_topic.custom_fields[AVG_FIELD] = avg&.round(2)&.to_s
+      item_topic.save_custom_fields(true)
+    end
   end
 end
 

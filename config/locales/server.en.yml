@@ -9,3 +9,5 @@ en:
       tagline_required: "Add a one-line description."
       tagline_too_long: "The one-line description must be %{count} characters or fewer."
       image_required: "Add at least one image to the post."
+      board_closed: "This rating board is closed, so its items can no longer be scored."
+      already_scored: "You have already scored this item. Delete your score first if you want to score again."

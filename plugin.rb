@@ -19,6 +19,8 @@ after_initialize do
   register_topic_custom_field_type(DiscourseKuuRatings::ItemFields::BOARD_TOPIC_ID, :integer)
   register_topic_custom_field_type(DiscourseKuuRatings::ItemFields::TAGLINE, :string)
   DiscourseKuuRatings::ItemFields::NAMES.each { |name| register_editable_topic_custom_field(name) }
+  register_topic_custom_field_type(DiscourseKuuRatings::RatingScore::COUNT_FIELD, :integer)
+  register_topic_custom_field_type(DiscourseKuuRatings::RatingScore::AVG_FIELD, :string)
 
   # 进审核队列时 core 只保存正文、标签等，不加这一项自定义字段会丢
   if NewPostManager.plugin_payload_attributes.exclude?(:topic_opts)

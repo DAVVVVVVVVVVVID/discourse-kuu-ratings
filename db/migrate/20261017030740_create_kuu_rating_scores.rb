@@ -13,7 +13,7 @@ class CreateKuuRatingScores < ActiveRecord::Migration[8.1]
     add_index :kuu_rating_scores, %i[user_id created_at]
     add_index :kuu_rating_scores, :post_id, unique: true, where: "post_id IS NOT NULL"
     add_check_constraint :kuu_rating_scores,
-                         "score BETWEEN 0 AND 10",
+                         "score IN (2, 4, 6, 8, 10)",
                          name: "kuu_rating_scores_score_range"
   end
 end
