@@ -1,0 +1,4 @@
+discourse_kuu_ratings:
+  kuu_ratings_enabled:
+    default: false
+    client: true
