@@ -4,11 +4,24 @@
   --kuu-card-shadow: var(--shadow-card);
 }
 
+// 从帖子流里藏起来的帖子。不能用 display: none：帖子流离开视口时会把帖子换成占位块（cloaking），
+// 占位块照抄帖子算出来的 margin，又不带我们的 class，于是隐藏的帖子在 0 和几像素之间来回切换，
+// Chrome 和手机上整页跟着抖。压成 0 高度、去掉 margin 后，换不换占位块高度都是 0
+@mixin kuu-collapse-post {
+  height: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  visibility: hidden;
+}
+
 // 评分主题的首帖只有插件生成的固定文字，评分对象的首帖只有那张图，都由插件的内容代替
 body.kuu-board-topic,
 body.kuu-item-topic {
   .topic-post[data-post-number="1"] {
-    display: none;
+    @include kuu-collapse-post;
   }
 }
 
@@ -640,7 +653,7 @@ body.kuu-item-topic .topic-footer-main-buttons .create {
 
 // 楼中楼：回复在帖子流里隐藏，收进所属短评下面的 .kuu-review-thread
 .topic-post.kuu-thread-reply {
-  display: none;
+  @include kuu-collapse-post;
 }
 
 // 短评被删除时，楼借第一条回复的位置显示，回复本身的正文隐藏（它会出现在楼里）
