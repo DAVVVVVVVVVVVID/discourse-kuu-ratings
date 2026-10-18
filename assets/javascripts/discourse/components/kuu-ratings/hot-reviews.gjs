@@ -21,12 +21,24 @@ const HotReviews = <template>
             </span>
             <StarRating @score={{review.score}} />
             <a
-              class="kuu-hot-review__likes"
+              class="kuu-hot-review__stats"
               href={{postUrl @topicUrl review}}
               title={{i18n "kuu_ratings.view_post"}}
             >
-              {{dIcon "heart"}}
-              {{review.like_count}}
+              <span
+                class="kuu-hot-review__likes"
+                title={{i18n "kuu_ratings.thread.likes"}}
+              >
+                {{dIcon "heart"}}
+                {{review.like_count}}
+              </span>
+              <span
+                class="kuu-hot-review__replies"
+                title={{i18n "kuu_ratings.thread.replies"}}
+              >
+                {{dIcon "far-comment"}}
+                {{review.reply_count}}
+              </span>
             </a>
           </div>
           <div class="kuu-hot-review__body cooked">{{cooked review}}</div>

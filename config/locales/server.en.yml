@@ -15,6 +15,8 @@ en:
       image_invalid: "Upload one image for each rating item."
       image_missing: "An image has been deleted, so this can't be published."
       publish_failed: "Publishing failed. Please try again later."
+      review_deleted: "This review has been deleted and can no longer be replied to."
+      reply_length: "Replies must be between 1 and %{max} characters."
   discourse_kuu_ratings:
     reviewables:
       actions:

@@ -52,6 +52,14 @@ RSpec.describe DiscourseKuuRatings::ItemsController do
       expect(cards.second).to include("score_avg" => nil, "score_count" => 0, "hot_review" => nil)
     end
 
+    it "leaves the reply count out of the hot review on the cards" do
+      kuu_reply_to(review.post)
+
+      get items_path
+
+      expect(response.parsed_body["items"].first["hot_review"].keys).to match_array(review_keys)
+    end
+
     context "with a sort" do
       it "orders the cards by it" do
         get items_path, params: { sort: "latest" }
@@ -156,6 +164,18 @@ RSpec.describe DiscourseKuuRatings::ItemsController do
         "accepts_scores" => true,
         "can_score" => false,
       )
+    end
+
+    it "counts the replies of each hot review" do
+      reply = kuu_reply_to(review.post)
+      kuu_reply_to(reply)
+      reply.update!(like_count: 5)
+
+      get item_path
+
+      expect(
+        response.parsed_body["hot_reviews"].map { |hot| hot.slice("post_id", "reply_count") },
+      ).to eq([{ "post_id" => review.post_id, "reply_count" => 2 }])
     end
 
     context "when a logged in user views the item" do

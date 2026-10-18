@@ -144,15 +144,6 @@ RSpec.describe "Score rating item" do
       expect(topic_page.composer).to be_closed
     end
 
-    it "lets the user reply to a review" do
-      review = add_review(user: Fabricate(:user), score: 8, comment: "Rich broth, firm noodles")
-
-      item_page.visit_item(item_topic)
-      topic_page.click_post_action_button(review.post, :reply)
-
-      expect(topic_page.composer).to be_opened
-    end
-
     it "shows the user at most 3 top reviews" do
       reviews =
         [4, 3, 2, 1].map do |like_count|

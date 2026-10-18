@@ -8,6 +8,10 @@ export const POINTS_PER_STAR = 2;
 export const MAX_SCORE = STARS * POINTS_PER_STAR;
 export const COMMENT_MAX_LENGTH = 500;
 export const BOARD_SORTS = ["score", "count", "latest"];
+// 和服务端 ReviewThreads 保持一致：楼中楼默认显示几条、每次展开几条、回复最长多少字
+export const THREAD_PREVIEW_SIZE = 3;
+export const THREAD_PAGE_SIZE = 10;
+export const THREAD_REPLY_MAX_LENGTH = 500;
 
 export function boardCategoryId(siteSettings) {
   return parseInt(siteSettings.kuu_ratings_board_category, 10) || null;

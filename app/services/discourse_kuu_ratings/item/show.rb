@@ -21,6 +21,7 @@ module DiscourseKuuRatings
     model :star_counts, optional: true
     model :my_rating_score, optional: true
     model :hot_reviews, optional: true
+    model :hot_review_reply_counts, optional: true
 
     private
 
@@ -67,6 +68,10 @@ module DiscourseKuuRatings
 
     def fetch_hot_reviews(item_topic:)
       RatingScore.hot_reviews([item_topic.id], per_item: HOT_REVIEWS_LIMIT).to_a
+    end
+
+    def fetch_hot_review_reply_counts(guardian:, hot_reviews:)
+      ReviewThreads.reply_counts(hot_reviews.map(&:post_id), guardian)
     end
   end
 end

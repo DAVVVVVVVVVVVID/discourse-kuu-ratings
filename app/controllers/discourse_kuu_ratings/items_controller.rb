@@ -34,7 +34,7 @@ module DiscourseKuuRatings
 
     def show
       Item::Show.call(service_params) do
-        on_success do |item_topic:, board_topic:, accepts_scores:, can_score:, star_counts:, my_rating_score:, hot_reviews:|
+        on_success do |item_topic:, board_topic:, accepts_scores:, can_score:, star_counts:, my_rating_score:, hot_reviews:, hot_review_reply_counts:|
           render json:
                    ItemDetailSerializer.new(
                      item_topic,
@@ -46,6 +46,7 @@ module DiscourseKuuRatings
                      star_counts:,
                      my_rating_score:,
                      hot_reviews:,
+                     hot_review_reply_counts:,
                    ).as_json
         end
         on_failed_contract do |contract|

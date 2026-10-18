@@ -174,6 +174,22 @@ RSpec.describe DiscourseKuuRatings::Item::Show do
       it "returns the 3 most liked reviews" do
         expect(result.hot_reviews).to eq([first_review, second_review, third_review])
       end
+
+      it "counts the replies the user can see under each hot review" do
+        SiteSetting.kuu_ratings_enabled = true
+        reply = kuu_reply_to(first_review.post)
+        kuu_reply_to(reply)
+        kuu_reply_to(second_review.post).trash!
+
+        expect(result.hot_review_reply_counts).to eq(first_review.post_id => 2)
+      end
+
+      it "leaves liked replies out of the hot reviews" do
+        SiteSetting.kuu_ratings_enabled = true
+        kuu_reply_to(third_review.post).update!(like_count: 10)
+
+        expect(result.hot_reviews).to eq([first_review, second_review, third_review])
+      end
     end
   end
 end

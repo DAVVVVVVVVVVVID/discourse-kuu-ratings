@@ -6,7 +6,7 @@ module DiscourseKuuRatings
     attributes :closed, :board_topic_id, :board, :accepts_scores, :can_score, :star_counts
 
     has_one :my_rating_score, serializer: RatingScoreSerializer, embed: :objects
-    has_many :hot_reviews, serializer: ReviewSerializer, embed: :objects
+    attributes :hot_reviews
 
     def board_topic_id
       object.custom_fields[ItemFields::BOARD_TOPIC_ID]
@@ -42,8 +42,14 @@ module DiscourseKuuRatings
       @options[:my_rating_score].present?
     end
 
+    # 热评区的短评带上回复数（楼中楼），所以自己序列化，把回复数传给 ReviewSerializer
     def hot_reviews
-      @options[:hot_reviews]
+      ActiveModel::ArraySerializer.new(
+        @options[:hot_reviews],
+        each_serializer: ReviewSerializer,
+        scope:,
+        reply_counts: @options[:hot_review_reply_counts] || {},
+      ).as_json
     end
   end
 end

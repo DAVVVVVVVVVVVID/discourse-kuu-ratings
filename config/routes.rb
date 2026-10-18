@@ -7,6 +7,7 @@ DiscourseKuuRatings::Engine.routes.draw do
   get "/items/:item_topic_id" => "items#show"
   post "/items/:item_topic_id/score" => "scores#create"
   delete "/items/:item_topic_id/score" => "scores#destroy"
+  get "/reviews/:post_id/replies" => "reviews#replies"
 end
 
 Discourse::Application.routes.draw { mount ::DiscourseKuuRatings::Engine, at: "kuu-ratings" }
