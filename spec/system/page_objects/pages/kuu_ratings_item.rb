@@ -93,6 +93,32 @@ module PageObjects
           end
       end
 
+      def visit_post(post)
+        page.visit(post.url)
+        has_css?(".kuu-item .kuu-score-panel")
+        self
+      end
+
+      def review_thread(review)
+        PageObjects::Components::KuuRatingsReviewThread.new(review)
+      end
+
+      # 帖子流里显示的帖子（楼中楼的回复不在这里显示）
+      def has_post_in_stream?(post)
+        has_css?(".topic-post #post_#{post.post_number}", visible: true)
+      end
+
+      def has_no_post_in_stream?(post)
+        has_no_css?(".topic-post #post_#{post.post_number}", visible: true)
+      end
+
+      def has_hot_review_reply_count?(review, count:)
+        has_css?(".kuu-hot-review", text: review.user.username) &&
+          within(find(".kuu-hot-review", text: review.user.username)) do
+            has_css?(".kuu-hot-review__replies", exact_text: count.to_s)
+          end
+      end
+
       def has_review_post?(user, comment, score:)
         has_css?(".topic-post:not([data-post-number='1'])", text: comment) &&
           within(find(".topic-post:not([data-post-number='1'])", text: comment)) do

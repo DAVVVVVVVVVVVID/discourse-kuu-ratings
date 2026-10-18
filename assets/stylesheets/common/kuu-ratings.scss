@@ -603,16 +603,23 @@ body.kuu-item-topic .topic-footer-main-buttons .create {
     font-weight: bold;
   }
 
-  &__likes {
+  &__stats {
     display: inline-flex;
-    gap: var(--space-1);
+    gap: var(--space-3);
     align-items: center;
     margin-left: auto;
     color: var(--primary-medium);
+  }
 
-    .d-icon {
-      color: var(--love);
-    }
+  &__likes,
+  &__replies {
+    display: inline-flex;
+    gap: var(--space-1);
+    align-items: center;
+  }
+
+  &__likes .d-icon {
+    color: var(--love);
   }
 
   &__body {
@@ -629,4 +636,131 @@ body.kuu-item-topic .topic-footer-main-buttons .create {
   align-items: center;
   margin-left: var(--space-2);
   font-size: var(--font-down-2);
+}
+
+// 楼中楼：回复在帖子流里隐藏，收进所属短评下面的 .kuu-review-thread
+.topic-post.kuu-thread-reply {
+  display: none;
+}
+
+// 短评被删除时，楼借第一条回复的位置显示，回复本身的正文隐藏（它会出现在楼里）
+.topic-post.kuu-thread-anchor > article {
+  display: none;
+}
+
+.kuu-review-thread {
+  margin: 0 0 var(--space-3) var(--topic-avatar-width, 3rem);
+  padding: var(--space-2) var(--space-3);
+  background: var(--primary-very-low);
+  border-radius: var(--d-default-border-radius);
+
+  &:empty {
+    display: none;
+  }
+
+  &.--anchor {
+    margin-top: var(--space-3);
+  }
+
+  &__deleted {
+    margin: 0 0 var(--space-2);
+    color: var(--primary-medium);
+    font-style: italic;
+  }
+
+  &__replies {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__more {
+    margin-top: var(--space-1);
+    color: var(--tertiary);
+  }
+}
+
+.kuu-review-reply {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-1);
+  border-radius: var(--d-default-border-radius);
+
+  &.--highlighted {
+    background: var(--tertiary-very-low);
+  }
+
+  &__main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: center;
+    font-size: var(--font-down-1);
+  }
+
+  &__username {
+    font-weight: bold;
+  }
+
+  &__body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    align-items: baseline;
+  }
+
+  &__reply-to {
+    color: var(--primary-medium);
+    white-space: nowrap;
+  }
+
+  &__cooked {
+    min-width: 0;
+    overflow-wrap: anywhere;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-2);
+    align-items: center;
+    color: var(--primary-medium);
+    font-size: var(--font-down-1);
+
+    .btn {
+      padding: 0 var(--space-1);
+      color: var(--primary-medium);
+      font-size: inherit;
+    }
+  }
+
+  &__like.--liked .d-icon {
+    color: var(--love);
+  }
+}
+
+.kuu-reply-input {
+  margin-top: var(--space-2);
+
+  &__error {
+    margin-bottom: var(--space-2);
+  }
+}
+
+@media (width <= 40rem) {
+  .kuu-review-thread {
+    margin-left: 0;
+  }
 }

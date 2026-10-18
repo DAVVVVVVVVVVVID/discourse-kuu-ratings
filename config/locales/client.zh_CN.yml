@@ -46,6 +46,23 @@ zh_CN:
           other: "%{count} 星"
       distribution: "星级分布"
       hot_reviews: "热评"
+      thread:
+        reply: "回复"
+        send: "发送"
+        reply_to: "回复 @%{username}："
+        reply_placeholder: "回复 @%{username}"
+        view_all:
+          other: "共 %{count} 条回复，点击查看"
+        view_more: "展开更多回复"
+        review_deleted: "该短评已删除"
+        enqueued: "回复已提交，审核通过后显示"
+        like: "点赞"
+        likes: "点赞数"
+        replies: "回复数"
+        edit: "编辑"
+        delete: "删除"
+        flag: "举报"
+        delete_confirm: "确定删除这条回复吗？"
       view_post: "查看这条短评"
       score:
         title: "我来打分"
