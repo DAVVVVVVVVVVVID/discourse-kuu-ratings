@@ -93,11 +93,16 @@ RSpec.describe "Browse rating board" do
     expect(board_page).to have_items_in_order(top_item, popular_item, fresh_item)
   end
 
+  # 打开帖子后 Discourse 会按当前读到的帖子在网址后面补上帖子编号（/t/slug/id/2），时机不固定
+  def item_path(item)
+    %r{\A#{Regexp.escape(item.relative_url)}(/\d+)?\z}
+  end
+
   it "takes the user to an item when they click it" do
     board_page.visit_board(board_topic)
     board_page.click_item(popular_item)
 
-    expect(page).to have_current_path(popular_item.relative_url)
+    expect(page).to have_current_path(item_path(popular_item))
     expect(item_page).to have_board_link(board_topic)
   end
 
@@ -110,7 +115,8 @@ RSpec.describe "Browse rating board" do
 
     board_page.click_item(top_item)
 
-    expect(page).to have_current_path(top_item.relative_url)
+    expect(page).to have_current_path(item_path(top_item))
+    expect(item_page).to have_board_link(board_topic)
   end
 
   it "keeps the items out of the latest list" do

@@ -10,6 +10,7 @@
 ## 已确定的规则（不要自行改）
 - 一个评分主题里有多个评分对象；评分主题和评分对象都是 topic，分别在「评分」「评分 › 评分对象」分类
 - 新建评分主题和添加评分对象都用插件自己的表单，不用 Discourse 的发帖框：评分主题只有名称，创建时至少带 2 个评分对象；评分对象只有图片和名称。名称都是 30 字以内，同一个评分主题里对象不能重名
+- 「新建话题」按钮统一由 `discourse-kuu-new-topic` 插件处理（2026-10-18 定）。本插件不再注册 `create-topic-button-click`、`can-create-topic-button` 转换器，只向它登记「评分主题」类型（`id: kuu-ratings-board`）：评分分类里直接打开表单，其他地方出现在选择框里。新插件是硬依赖：CI 通过 `about.json` 一起安装，线上要和本插件一起装；本地在 `~/discourse/plugins/discourse-kuu-new-topic`，不要改它，接口不够用先告诉 David
 - 审核用插件自己注册的审核类型：新建评分主题时「主题 + 所有对象」打包成一条，作为整体批准或拒绝；单独添加的对象一个一条。批准后插件才建帖子，首帖内容由插件生成；插件建帖时跳过 Discourse 的标题最短长度和不能重名两条规则
 - 评分主题页不显示首帖，标题下面直接是评分对象横条列表（左图片，名称和第一条热评，右边星星、分数保留 1 位小数、打分人数）
 - 10 分制，像虎扑一样显示五颗星，每颗星 2 分，只能选整颗星：每人对每个评分对象打一次分（2/4/6/8/10），数据库存 10 分制的分数，平均分可以是小数；短评选填；不能修改，只能删除后重打（删除时短评一起删）
@@ -32,6 +33,8 @@
 - 浏览器测试（spec/system）要求容器里有 Playwright 浏览器和它依赖的系统库。容器新建或 Playwright 升级后，报 `Executable doesn't exist` 或 `error while loading shared libraries` 时执行：
   - `d/exec pnpm playwright-install`（下载浏览器）
   - `docker exec -u root -w /src discourse_dev bash -c 'pnpm exec playwright install-deps chromium'`（用 root 装系统库）
+- 停掉 `d/dev`（或它崩溃）之后，`~/discourse/frontend/discourse/dist/manifest/build.json` 还记着已经不存在的 rolldown 进程，system spec 会报 `Rolldown process (pid ...) is no longer running`，一片失败。删掉这个文件再跑；`d/dev` 启动时报 `rolldown devserver is already running` 也是同一个原因
+- 开发服务器和全部测试同时跑时 WSL 内存不够（共 4.9GB），会出现和代码无关的随机失败。跑全部测试前先停掉 `d/dev`
 - 测试环境的样式表只在第一次跑 system spec 时算一次版本号，之后改了 SCSS 也不会重新编译（现象：system spec 里插件样式是旧的或缺失，比如首帖没隐藏）。改完样式要删掉缓存：`rm -f ~/discourse/tmp/cache/assets/test/stylesheet-manifest-test_* && rm -rf ~/discourse/tmp/stylesheet-cache/test_*`
 - 改了 `plugin.rb` 之后，开发服务器会自动重载，但可能留下一个孤儿 worker（`ps -eo pid,ppid,args` 里 PPID 为 1 的 `pitchfork ... worker`），它继续用旧代码接请求，现象是页面时好时坏（比如插件样式时有时无）。`docker exec discourse_dev kill <pid>` 结束它，或者重启 `d/dev`
 - 开发服务器重载代码（比如改了 `lib/` 下的文件）之后，插件在 `after_initialize` 里注册到 core 的东西可能从 web 进程里丢失，但 `rails runner` 里一切正常。见过的现象：审核队列看不到「评分投稿」、按类型筛选报 400 `invalid_parameters: type`；「最新」里又出现评分对象（`TopicQuery.add_custom_filter` 丢了）。重启 `d/dev` 就好，线上不受影响
