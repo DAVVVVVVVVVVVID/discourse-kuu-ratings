@@ -229,49 +229,10 @@ body.kuu-item-topic .topic-footer-main-buttons .create {
   }
 }
 
-.kuu-new-topic-choice {
-  &__options {
-    display: grid;
-    gap: var(--space-3);
-  }
-
-  &__option {
-    display: flex;
-    gap: var(--space-3);
-    align-items: flex-start;
-    justify-content: flex-start;
-    width: 100%;
-    padding: var(--space-4);
-    text-align: left;
-    white-space: normal;
-  }
-
-  &__icon {
-    flex-shrink: 0;
-    margin-top: 0.15em;
-    color: var(--tertiary);
-    font-size: var(--font-up-2);
-  }
-
-  &__option.--board &__icon {
-    color: var(--kuu-star-color);
-  }
-
-  &__text {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
-  }
-
-  &__label {
-    color: var(--primary);
-    font-weight: bold;
-  }
-
-  &__description {
-    color: var(--primary-medium);
-    font-size: var(--font-down-1);
-  }
+// 「新建话题」的选择框由 discourse-kuu-new-topic 提供，这里只给评分主题选项的星星上色
+.kuu-new-topic-choice__option[data-type-id="kuu-ratings-board"]
+  .kuu-new-topic-choice__icon {
+  color: var(--kuu-star-color);
 }
 
 .kuu-new-board-form {

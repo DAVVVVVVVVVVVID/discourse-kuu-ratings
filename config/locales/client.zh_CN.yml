@@ -20,9 +20,6 @@ zh_CN:
       submitted: "已提交，管理员审核通过后会发布并通知你"
       review_hint: "提交后由管理员审核，通过后发布"
       new_topic_choice:
-        title: "你想发布什么？"
-        topic: "话题"
-        topic_description: "发起讨论、提问或分享"
         board: "评分主题"
         board_description: "列出几个对象，让大家打分和点评"
       board_form:

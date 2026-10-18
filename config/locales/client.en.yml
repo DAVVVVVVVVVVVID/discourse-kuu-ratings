@@ -21,9 +21,6 @@ en:
       submitted: "Submitted. It will be published, and you'll be notified, once a moderator approves it"
       review_hint: "A moderator will review it before it's published"
       new_topic_choice:
-        title: "What would you like to post?"
-        topic: "Topic"
-        topic_description: "Start a discussion, ask a question or share something"
         board: "Rating board"
         board_description: "List a few items for everyone to rate and review"
       board_form:
