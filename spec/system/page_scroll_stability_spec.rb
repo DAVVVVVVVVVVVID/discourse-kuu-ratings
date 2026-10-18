@@ -85,7 +85,7 @@ RSpec.describe "Rating page scroll stability" do
 
   it_behaves_like "a stable rating page"
 
-  context "on mobile", mobile: true do
+  context "when on mobile", mobile: true do
     it_behaves_like "a stable rating page"
   end
 end
