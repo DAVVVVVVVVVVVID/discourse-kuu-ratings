@@ -99,6 +99,7 @@ RSpec.describe DiscourseKuuRatings::RatingScore::Destroy do
             params: {
               item_topic_id:,
               stars: 5,
+              comment: "再来一次",
             },
             guardian: user.guardian,
           ),

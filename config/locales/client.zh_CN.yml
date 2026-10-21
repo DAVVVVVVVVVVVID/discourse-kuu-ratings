@@ -72,7 +72,10 @@ zh_CN:
         points: "%{score} 分"
         stars: "星级"
         comment: "短评"
-        comment_placeholder: "说说你的体验（选填）"
+        comment_placeholder: "说说你的体验"
+        comment_required: "说点什么吧～"
+        comment_too_short:
+          other: "至少写 %{count} 个字"
         submit: "提交"
         mine: "你打了 %{score} 分"
         delete: "删除我的打分"

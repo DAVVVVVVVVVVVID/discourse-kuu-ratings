@@ -14,9 +14,9 @@ RSpec.describe "Review threads on posts in rating items" do
     SiteSetting.kuu_ratings_item_category = item_category.id
     kuu_add_review(item_topic)
   end
-  # replier 打了 6 分；第二条回复的是第一条回复（楼里的回复），其余直接回复短评
+  # replier 打了 6 分（短评必填以前的只打星数据，没有短评帖）；第二条回复的是第一条回复（楼里的回复），其余直接回复短评
   let!(:first_reply) do
-    kuu_add_review(item_topic, user: replier, stars: 3, comment: nil)
+    Fabricate(:kuu_rating_score, item_topic:, user: replier, score: 6)
     kuu_reply_to(review, user: replier)
   end
   let!(:reply_to_reply) { kuu_reply_to(first_reply) }

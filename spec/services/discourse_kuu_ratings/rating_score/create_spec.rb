@@ -5,7 +5,6 @@ RSpec.describe DiscourseKuuRatings::RatingScore::Create do
     it { is_expected.to validate_presence_of(:item_topic_id) }
     it { is_expected.to allow_values(1, 5, "3").for(:stars) }
     it { is_expected.not_to allow_values(nil, 0, 6, 4.0, 4.5, "4.5", "abc").for(:stars) }
-    it { is_expected.to validate_length_of(:comment).is_at_most(500) }
 
     it "strips surrounding whitespace from the comment" do
       contract = described_class.new(comment: "  好吃  ")
@@ -14,7 +13,7 @@ RSpec.describe DiscourseKuuRatings::RatingScore::Create do
       expect(contract.comment).to eq("好吃")
     end
 
-    it "treats a blank comment as no comment" do
+    it "treats a blank comment as a missing comment" do
       contract = described_class.new(comment: "   ")
       contract.validate
 
@@ -138,23 +137,92 @@ RSpec.describe DiscourseKuuRatings::RatingScore::Create do
       it { is_expected.to fail_a_policy(:comment_is_acceptable) }
     end
 
+    # 短评必填（Issue #7）
+    shared_examples "a rejected comment" do |error_key|
+      it { is_expected.to fail_a_contract }
+
+      it "explains what is wrong with the comment" do
+        expect(result["result.contract.default"].errors.full_messages).to contain_exactly(
+          error_key == :required ? I18n.t("kuu_ratings.errors.comment_required") : length_error,
+        )
+      end
+
+      it "creates neither a score nor a post" do
+        expect { result }.to not_change { DiscourseKuuRatings::RatingScore.count }.and not_change {
+                Post.count
+              }
+      end
+    end
+
+    let(:length_error) { I18n.t("kuu_ratings.errors.comment_length", min: 2, max: 500) }
+
     context "without a comment" do
-      let(:comment) { "   " }
+      let(:comment) { nil }
+
+      it_behaves_like "a rejected comment", :required
+    end
+
+    context "with an empty comment" do
+      let(:comment) { "" }
+
+      it_behaves_like "a rejected comment", :required
+    end
+
+    context "with a comment made only of whitespace" do
+      let(:comment) { " \n\t " }
+
+      it_behaves_like "a rejected comment", :required
+    end
+
+    # 中文输入法常打出全角空格（U+3000），String#strip 去不掉，服务端要自己去
+    context "with a comment made only of full-width spaces" do
+      let(:comment) { "　　" }
+
+      it_behaves_like "a rejected comment", :required
+    end
+
+    context "with a 1 character comment" do
+      let(:comment) { " 好 " }
+
+      it_behaves_like "a rejected comment", :length
+    end
+
+    context "with a 501 character comment" do
+      let(:comment) { "好" * 501 }
+
+      it_behaves_like "a rejected comment", :length
+    end
+
+    context "with a 2 character comment" do
+      let(:comment) { "好吃" }
 
       it { is_expected.to run_successfully }
 
-      it "creates the score without a comment post" do
-        expect { result }.not_to change { Post.count }
-        expect(result.rating_score).to have_attributes(item_topic:, user:, score: 8, post: nil)
+      it "posts the comment and links it to the score" do
+        expect { result }.to change { item_topic.posts.count }.by(1)
+        rating_score = result.rating_score.reload
+        expect(rating_score.post_id).to eq(result.comment_post.id)
+        expect(rating_score.post).to have_attributes(topic: item_topic, user:, raw: "好吃")
       end
 
-      it "refreshes the item stats" do
-        result
+      context "when the core minimum post length is longer" do
+        before { SiteSetting.min_post_length = 8 }
 
-        expect(item_topic.reload.custom_fields).to include(
-          "kuu_score_count" => 1,
-          "kuu_score_avg" => "8.0",
-        )
+        it { is_expected.to run_successfully }
+
+        it "still posts the comment" do
+          expect(result.rating_score.reload.post.raw).to eq("好吃")
+        end
+      end
+    end
+
+    context "with a 500 character comment" do
+      let(:comment) { "好" * 500 }
+
+      it { is_expected.to run_successfully }
+
+      it "posts the whole comment" do
+        expect(result.rating_score.reload.post.raw).to eq("好" * 500)
       end
     end
 

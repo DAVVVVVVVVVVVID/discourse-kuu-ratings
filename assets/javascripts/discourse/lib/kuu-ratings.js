@@ -2,10 +2,11 @@
 export const NAME_MAX_LENGTH = 30;
 export const BOARD_MIN_ITEMS = 2;
 export const BOARD_MAX_ITEMS = 20;
-// 和服务端 RatingScore::MAX_STARS、POINTS_PER_STAR、COMMENT_MAX_LENGTH、BoardItemsQuery::SORTS 保持一致
+// 和服务端 RatingScore::MAX_STARS、POINTS_PER_STAR、COMMENT_LENGTH、BoardItemsQuery::SORTS 保持一致
 export const STARS = 5;
 export const POINTS_PER_STAR = 2;
 export const MAX_SCORE = STARS * POINTS_PER_STAR;
+export const COMMENT_MIN_LENGTH = 2;
 export const COMMENT_MAX_LENGTH = 500;
 export const BOARD_SORTS = ["score", "count", "latest"];
 // 和服务端 ReviewThreads 保持一致：楼中楼默认显示几条、每次展开几条、回复最长多少字
