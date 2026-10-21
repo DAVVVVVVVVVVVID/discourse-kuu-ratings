@@ -848,14 +848,12 @@ $kuu-board-card-radius: 8px;
     }
   }
 
-  // 名字最多两行，再长才截断
+  // 名字只显示一行，超出用省略号（10-21 David 定：两行时一排对象高低不齐）
   &__name {
-    display: -webkit-box;
     overflow: hidden;
     line-height: 1.3;
-    overflow-wrap: anywhere;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &__score {
