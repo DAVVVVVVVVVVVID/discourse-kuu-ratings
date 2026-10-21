@@ -10,13 +10,13 @@ import { extractError, popupAjaxError } from "discourse/lib/ajax-error";
 import { not } from "discourse/truth-helpers";
 import DButton from "discourse/ui-kit/d-button";
 import { i18n } from "discourse-i18n";
-import { COMMENT_MAX_LENGTH } from "../../lib/kuu-ratings";
+import { COMMENT_MAX_LENGTH, COMMENT_MIN_LENGTH } from "../../lib/kuu-ratings";
 import StarInput from "./star-input";
 import StarRating from "./star-rating";
 
 export const START_SCORING_EVENT = "kuu-ratings:start-scoring";
 
-// 评分对象页的「我来打分」：没打过分时是星星和选填的短评，打过分时显示分数和删除按钮
+// 评分对象页的「我来打分」：没打过分时是星星和必填的短评，打过分时显示分数和删除按钮
 export default class ScorePanel extends Component {
   @service appEvents;
   @service currentUser;
@@ -40,6 +40,26 @@ export default class ScorePanel extends Component {
 
   get myScore() {
     return this.args.item.my_rating_score;
+  }
+
+  // 短评必填（Issue #7），和服务端一样去掉首尾空白后按字数检查。
+  // 按字符数（展开成数组），一个 emoji 算一个字，和服务端 Ruby 的 String#length 一致
+  @action
+  validateComment(name, value, { addError }) {
+    const length = [...(value ?? "").trim()].length;
+    if (length === 0) {
+      addError(name, {
+        title: i18n("kuu_ratings.score.comment"),
+        message: i18n("kuu_ratings.score.comment_required"),
+      });
+    } else if (length < COMMENT_MIN_LENGTH) {
+      addError(name, {
+        title: i18n("kuu_ratings.score.comment"),
+        message: i18n("kuu_ratings.score.comment_too_short", {
+          count: COMMENT_MIN_LENGTH,
+        }),
+      });
+    }
   }
 
   @action
@@ -148,6 +168,7 @@ export default class ScorePanel extends Component {
             @showTitle={{false}}
             @title={{i18n "kuu_ratings.score.comment"}}
             @type="textarea"
+            @validate={{this.validateComment}}
             @validation={{this.commentValidation}}
             as |field|
           >

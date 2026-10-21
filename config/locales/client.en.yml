@@ -76,7 +76,11 @@ en:
         points: "%{score} points"
         stars: "Stars"
         comment: "Review"
-        comment_placeholder: "Share your experience (optional)"
+        comment_placeholder: "Share your experience"
+        comment_required: "Say something about it~"
+        comment_too_short:
+          one: "Write at least %{count} character"
+          other: "Write at least %{count} characters"
         submit: "Submit"
         mine: "You rated it %{score}"
         delete: "Delete my rating"

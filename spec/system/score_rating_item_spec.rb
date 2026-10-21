@@ -70,12 +70,56 @@ RSpec.describe "Score rating item" do
       expect(item_page).to have_review_post(user, "Rich broth, firm noodles", score: 8)
     end
 
-    it "lets the user score the item without a review" do
+    it "asks the user for a review of at least 2 characters before scoring" do
       item_page.visit_item(item_topic)
+
+      expect(item_page).to have_comment_placeholder(
+        I18n.t("js.kuu_ratings.score.comment_placeholder"),
+      )
+
       item_page.pick_stars(2).submit_score
+
+      expect(item_page).to have_comment_error(I18n.t("js.kuu_ratings.score.comment_required"))
+
+      item_page.fill_in_comment("   ").submit_score
+
+      expect(item_page).to have_comment_error(I18n.t("js.kuu_ratings.score.comment_required"))
+
+      item_page.fill_in_comment("好").submit_score
+
+      expect(item_page).to have_comment_error(
+        I18n.t("js.kuu_ratings.score.comment_too_short", count: 2),
+      )
+      expect(item_page).to have_no_my_score
+      expect(item_page).to have_summary(score: "8.0", count: 2)
+      expect(DiscourseKuuRatings::RatingScore.exists?(user:)).to eq(false)
+
+      item_page.fill_in_comment("好吃").submit_score
 
       expect(item_page).to have_my_score(4)
       expect(item_page).to have_summary(score: "6.7", count: 3)
+      expect(item_page).to have_review_post(user, "好吃", score: 4)
+    end
+
+    context "when the site is in Chinese" do
+      before do
+        SiteSetting.default_locale = "zh_CN"
+        user.update!(locale: "zh_CN")
+      end
+
+      it "asks the user to say something in Chinese" do
+        item_page.visit_item(item_topic)
+
+        expect(item_page).to have_comment_placeholder("说说你的体验")
+
+        item_page.pick_stars(2).submit_score
+
+        expect(item_page).to have_comment_error("说点什么吧～")
+
+        item_page.fill_in_comment("好").submit_score
+
+        expect(item_page).to have_comment_error("至少写 2 个字")
+      end
     end
 
     it "lets the user delete their score and review after confirming" do
@@ -108,7 +152,12 @@ RSpec.describe "Score rating item" do
       expect(item_page).to have_hidden_first_post
       expect(item_page).to have_start_scoring_button
 
-      item_page.pick_stars(4).fill_in_comment("Rich broth, firm noodles").submit_score
+      item_page.pick_stars(4).submit_score
+
+      expect(item_page).to have_comment_error(I18n.t("js.kuu_ratings.score.comment_required"))
+      expect(item_page).to have_no_my_score
+
+      item_page.fill_in_comment("Rich broth, firm noodles").submit_score
 
       expect(item_page).to have_my_score(8)
       expect(item_page).to have_review_post(user, "Rich broth, firm noodles", score: 8)

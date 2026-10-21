@@ -58,13 +58,41 @@ RSpec.describe DiscourseKuuRatings::ScoresController do
     end
 
     context "with an invalid number of stars" do
-      let(:params) { { stars: "4.5" } }
+      let(:params) { { stars: "4.5", comment: "好吃" } }
 
       it "returns a 400 with the contract errors" do
         post score_path, params: params
 
         expect(response.status).to eq(400)
         expect(response.parsed_body["errors"]).to contain_exactly("Stars must be an integer")
+      end
+    end
+
+    context "without a comment" do
+      let(:params) { { stars: 4 } }
+
+      it "returns a 400 asking for a review and does not score the item" do
+        expect { post score_path, params: params }.not_to change {
+          DiscourseKuuRatings::RatingScore.count
+        }
+
+        expect(response.status).to eq(400)
+        expect(response.parsed_body["errors"]).to contain_exactly(
+          I18n.t("kuu_ratings.errors.comment_required"),
+        )
+      end
+    end
+
+    context "with a 1 character comment" do
+      let(:params) { { stars: 4, comment: "好" } }
+
+      it "returns a 400 with the length rule" do
+        post score_path, params: params
+
+        expect(response.status).to eq(400)
+        expect(response.parsed_body["errors"]).to contain_exactly(
+          I18n.t("kuu_ratings.errors.comment_length", min: 2, max: 500),
+        )
       end
     end
 

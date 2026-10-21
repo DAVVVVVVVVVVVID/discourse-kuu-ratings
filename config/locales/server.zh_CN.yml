@@ -16,6 +16,8 @@ zh_CN:
       image_invalid: "请为每个评分对象上传一张图片。"
       image_missing: "有图片已经被删除，无法发布。"
       publish_failed: "发布失败，请稍后再试。"
+      comment_required: "说点什么吧～"
+      comment_length: "短评要在 %{min}–%{max} 字之间。"
       review_deleted: "这条短评已经删除，不能再回复了。"
       reply_length: "回复要在 1–%{max} 字之间。"
   discourse_kuu_ratings:

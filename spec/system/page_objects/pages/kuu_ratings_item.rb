@@ -49,6 +49,17 @@ module PageObjects
         self
       end
 
+      def has_comment_placeholder?(placeholder)
+        has_css?(".kuu-score-panel__form textarea[placeholder='#{placeholder}']")
+      end
+
+      def has_comment_error?(message)
+        has_css?(
+          ".kuu-score-panel__form .form-kit__field[data-name='comment'] .form-kit__errors",
+          text: message,
+        )
+      end
+
       def submit_score
         find(".kuu-score-panel__submit").click
         self

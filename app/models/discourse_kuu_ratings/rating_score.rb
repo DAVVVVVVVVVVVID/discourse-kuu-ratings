@@ -9,6 +9,8 @@ module DiscourseKuuRatings
     POINTS_PER_STAR = 2
     VALID_SCORES = (1..MAX_STARS).map { |stars| stars * POINTS_PER_STAR }.freeze
     COMMENT_MAX_LENGTH = 500
+    # 短评必填：「好吃」这种两个字也行（Issue #7）
+    COMMENT_LENGTH = (2..COMMENT_MAX_LENGTH)
     AVG_FIELD = "kuu_score_avg"
     COUNT_FIELD = "kuu_score_count"
 

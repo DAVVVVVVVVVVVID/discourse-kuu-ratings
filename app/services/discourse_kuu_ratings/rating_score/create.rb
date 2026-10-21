@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module DiscourseKuuRatings
-  # 给评分对象打分，可选附一条短评（短评是评分对象帖子里的回帖，不经过审核）
+  # 给评分对象打分并写一条短评（短评是评分对象帖子里的回帖，不经过审核）。
+  # 2026-10-21 起短评必填（Issue #7），以前只打星的打分由 rake kuu_ratings:backfill_star_reviews 补「N星」
   class RatingScore::Create
     include Service::Base
 
@@ -11,14 +12,36 @@ module DiscourseKuuRatings
       attribute :stars
       attribute :comment, :string
 
-      before_validation { self.comment = comment&.strip.presence }
+      # strip 去不掉中文输入法常打出的全角空格（U+3000），用 [[:space:]] 一起去掉
+
+      before_validation do
+        self.comment = comment&.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "").presence
+      end
 
       validates :item_topic_id, presence: true
       validates :stars, numericality: { only_integer: true, in: 1..RatingScore::MAX_STARS }
-      validates :comment, length: { maximum: RatingScore::COMMENT_MAX_LENGTH }
+      validate :comment_is_written
 
       def score
         RatingScore.score_for_stars(Integer(stars))
+      end
+
+      private
+
+      def comment_is_written
+        length = comment.to_s.length
+        if length.zero?
+          errors.add(:base, I18n.t("kuu_ratings.errors.comment_required"))
+        elsif !RatingScore::COMMENT_LENGTH.cover?(length)
+          errors.add(
+            :base,
+            I18n.t(
+              "kuu_ratings.errors.comment_length",
+              min: RatingScore::COMMENT_LENGTH.min,
+              max: RatingScore::COMMENT_LENGTH.max,
+            ),
+          )
+        end
       end
     end
 
@@ -27,16 +50,12 @@ module DiscourseKuuRatings
     policy :can_score_item
     policy :board_accepts_scores
     policy :not_scored_yet
-    only_if(:has_comment) do
-      policy :comment_is_acceptable, class_name: RatingScore::Policy::CommentIsAcceptable
-    end
+    policy :comment_is_acceptable, class_name: RatingScore::Policy::CommentIsAcceptable
 
     transaction do
       model :rating_score, :create_rating_score
-      only_if(:has_comment) do
-        model :comment_post, :create_comment_post
-        step :attach_comment_to_rating_score
-      end
+      model :comment_post, :create_comment_post
+      step :attach_comment_to_rating_score
       step :refresh_item_stats
     end
 
@@ -62,10 +81,6 @@ module DiscourseKuuRatings
 
     def not_scored_yet(guardian:, item_topic:)
       !RatingScore.exists?(item_topic:, user: guardian.user)
-    end
-
-    def has_comment(params:)
-      params.comment.present?
     end
 
     def create_rating_score(guardian:, item_topic:, params:)
