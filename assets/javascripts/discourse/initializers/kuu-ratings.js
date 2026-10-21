@@ -1,5 +1,6 @@
 import { action } from "@ember/object";
 import { withPluginApi } from "discourse/lib/plugin-api";
+import BoardCard from "../components/kuu-ratings/board-card";
 import BoardItems from "../components/kuu-ratings/board-items";
 import ItemHeader from "../components/kuu-ratings/item-header";
 import NewBoard from "../components/kuu-ratings/modal/new-board";
@@ -48,6 +49,16 @@ export default {
         "ReviewableKuuRatingSubmission",
         "approved",
         "rejected"
+      );
+
+      // 帖子列表里评分主题显示成卡片：标题下面一排评分对象，FKB Pro 卡片的上中下三块由样式隐藏
+      api.renderInOutlet("topic-list-after-title", BoardCard);
+      api.registerValueTransformer(
+        "topic-list-item-class",
+        ({ value, context }) =>
+          context.topic?.kuu_rating_board_card
+            ? [...value, "kuu-rating-board"]
+            : value
       );
 
       api.renderInOutlet("topic-above-posts", BoardItems);

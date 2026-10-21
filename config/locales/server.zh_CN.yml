@@ -3,6 +3,7 @@ zh_CN:
     kuu_ratings_enabled: "启用 KUU 评分（评分主题、评分对象、五颗星打分和短评）。"
     kuu_ratings_board_category: "放评分主题的分类。帖子由插件在审核通过后创建，普通用户在这个分类只需要回复权限。"
     kuu_ratings_item_category: "放评分对象的分类，一般是评分分类的子分类。帖子由插件在审核通过后创建，普通用户在这个分类只需要回复权限。"
+    kuu_ratings_placeholder_image: "帖子列表的评分主题卡片里，没有图片的评分对象用的图（建议正方形，至少 400×400）。没设时显示灰色图标。"
   kuu_ratings:
     board_first_post: "这是一个评分主题，评分对象都列在标题下面。"
     errors:

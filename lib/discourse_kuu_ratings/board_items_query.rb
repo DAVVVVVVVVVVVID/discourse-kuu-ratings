@@ -15,24 +15,29 @@ module DiscourseKuuRatings
     SORTS = ORDERS.keys.freeze
 
     def self.call(board_topic:, guardian:, sort:)
-      Topic
-        .secured(guardian)
-        .where(category_id: ItemFields.item_category_id, visible: true)
-        .joins(Topic.sanitize_sql_array([<<~SQL, board_topic_id: board_topic.id.to_s]))
-          INNER JOIN topic_custom_fields kuu_board
-            ON kuu_board.topic_id = topics.id
-            AND kuu_board.name = '#{ItemFields::BOARD_TOPIC_ID}'
-            AND kuu_board.value = :board_topic_id
-          LEFT JOIN topic_custom_fields kuu_avg
-            ON kuu_avg.topic_id = topics.id AND kuu_avg.name = '#{RatingScore::AVG_FIELD}'
-          LEFT JOIN topic_custom_fields kuu_count
-            ON kuu_count.topic_id = topics.id AND kuu_count.name = '#{RatingScore::COUNT_FIELD}'
-        SQL
+      scope([board_topic.id], guardian)
         .order(Arel.sql(ORDERS.fetch(sort)))
         .limit(MAX_ITEMS)
         .includes(:topic_thumbnails, :image_upload)
         .to_a
         .tap { |items| Topic.preload_custom_fields(items, CARD_FIELDS) }
+    end
+
+    # 几个评分主题下的对象，未排序。kuu_board.value 是所属评分主题的 id（字符串）
+    def self.scope(board_topic_ids, guardian)
+      Topic
+        .secured(guardian)
+        .where(category_id: ItemFields.item_category_id, visible: true)
+        .joins(Topic.sanitize_sql_array([<<~SQL, board_topic_ids: board_topic_ids.map(&:to_s)]))
+            INNER JOIN topic_custom_fields kuu_board
+              ON kuu_board.topic_id = topics.id
+              AND kuu_board.name = '#{ItemFields::BOARD_TOPIC_ID}'
+              AND kuu_board.value IN (:board_topic_ids)
+            LEFT JOIN topic_custom_fields kuu_avg
+              ON kuu_avg.topic_id = topics.id AND kuu_avg.name = '#{RatingScore::AVG_FIELD}'
+            LEFT JOIN topic_custom_fields kuu_count
+              ON kuu_count.topic_id = topics.id AND kuu_count.name = '#{RatingScore::COUNT_FIELD}'
+          SQL
     end
   end
 end

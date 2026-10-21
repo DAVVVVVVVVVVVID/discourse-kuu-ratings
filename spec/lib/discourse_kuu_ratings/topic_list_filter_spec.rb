@@ -67,9 +67,11 @@ RSpec.describe DiscourseKuuRatings::TopicListFilter do
     expect(topic_ids(suggested)).not_to include(item_topic.id)
   end
 
-  it "lists items on the item category page" do
-    expect(topic_ids(query(category: item_category.id).list_latest)).to include(item_topic.id)
-    expect(topic_ids(query(category: item_category.id.to_s).list_latest)).to include(item_topic.id)
+  it "hides items from the item category page" do
+    expect(topic_ids(query(category: item_category.id).list_latest)).not_to include(item_topic.id)
+    expect(topic_ids(query(category: item_category.id.to_s).list_latest)).not_to include(
+      item_topic.id,
+    )
   end
 
   context "when the item category is a top-level category" do
@@ -78,14 +80,21 @@ RSpec.describe DiscourseKuuRatings::TopicListFilter do
       SiteSetting.kuu_ratings_item_category = item_category.id
     end
 
-    it "lists items when the category is given by slug" do
-      expect(topic_ids(query(category: item_category.slug).list_latest)).to include(item_topic.id)
+    it "hides items when the category is given by slug" do
+      expect(topic_ids(query(category: item_category.slug).list_latest)).not_to include(
+        item_topic.id,
+      )
     end
   end
 
-  # core 只按一级分类解析 slug，子分类的 slug 不会被当成评分对象分类
   it "hides items when a subcategory slug is given" do
     expect(topic_ids(query(category: item_category.slug).list_latest)).not_to include(item_topic.id)
+  end
+
+  it "hides items from the topics a user created" do
+    other_topic.update!(user: item_topic.user)
+
+    expect(topic_ids(query.list_topics_by(item_topic.user))).to contain_exactly(other_topic.id)
   end
 
   context "when the item category is not set" do
@@ -102,6 +111,8 @@ RSpec.describe DiscourseKuuRatings::TopicListFilter do
     it "lists items everywhere" do
       expect(topic_ids(query.list_latest)).to include(item_topic.id)
       expect(topic_ids(query(category: board_category.id).list_latest)).to include(item_topic.id)
+      expect(topic_ids(query(category: item_category.id).list_latest)).to include(item_topic.id)
+      expect(topic_ids(query.list_topics_by(item_topic.user))).to include(item_topic.id)
     end
   end
 end

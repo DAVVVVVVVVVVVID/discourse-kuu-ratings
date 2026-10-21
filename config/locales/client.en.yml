@@ -23,6 +23,8 @@ en:
       new_topic_choice:
         board: "Rating board"
         board_description: "List a few items for everyone to rate and review"
+      board_card:
+        more: "See all"
       board_form:
         title: "New rating board"
         name: "Board name"
