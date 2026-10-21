@@ -35,6 +35,7 @@
   - `docker exec -u root -w /src discourse_dev bash -c 'pnpm exec playwright install-deps chromium'`（用 root 装系统库）
 - 停掉 `d/dev`（或它崩溃）之后，`~/discourse/frontend/discourse/dist/manifest/build.json` 还记着已经不存在的 rolldown 进程，system spec 会报 `Rolldown process (pid ...) is no longer running`，一片失败。删掉这个文件再跑；`d/dev` 启动时报 `rolldown devserver is already running` 也是同一个原因
 - 开发服务器和全部测试同时跑时 WSL 内存不够（共 4.9GB），会出现和代码无关的随机失败。跑全部测试前先停掉 `d/dev`
+- 其他 KUU 插件（二手、京大邮箱等）的 Claude Code 会话共用同一个 `discourse_dev` 容器，它们也会开 `d/dev`、跑截图和测试。全部测试大面积报 `NoSuchWindowError`（测试用的浏览器崩了）时，先 `docker exec discourse_dev ps -eo pid,rss,etime,args --sort=-rss | head` 看看是不是别的会话占着内存；不要结束别的会话的进程，等它们跑完再重跑失败的文件
 - 测试环境的样式表只在第一次跑 system spec 时算一次版本号，之后改了 SCSS 也不会重新编译（现象：system spec 里插件样式是旧的或缺失，比如首帖没隐藏）。改完样式要删掉缓存：`rm -f ~/discourse/tmp/cache/assets/test/stylesheet-manifest-test_* && rm -rf ~/discourse/tmp/stylesheet-cache/test_*`
 - 改了 `plugin.rb` 之后，开发服务器会自动重载，但可能留下一个孤儿 worker（`ps -eo pid,ppid,args` 里 PPID 为 1 的 `pitchfork ... worker`），它继续用旧代码接请求，现象是页面时好时坏（比如插件样式时有时无）。`docker exec discourse_dev kill <pid>` 结束它，或者重启 `d/dev`
 - 开发服务器重载代码（比如改了 `lib/` 下的文件）之后，插件在 `after_initialize` 里注册到 core 的东西可能从 web 进程里丢失，但 `rails runner` 里一切正常。见过的现象：审核队列看不到「评分投稿」、按类型筛选报 400 `invalid_parameters: type`；「最新」里又出现评分对象（`TopicQuery.add_custom_filter` 丢了）。重启 `d/dev` 就好，线上不受影响

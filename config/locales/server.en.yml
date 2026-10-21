@@ -3,6 +3,7 @@ en:
     kuu_ratings_enabled: "Enable KUU ratings (rating boards with multiple items, five-star scores and short reviews)."
     kuu_ratings_board_category: "Category for rating boards. The plugin creates the topics after approval, so regular users only need permission to reply here."
     kuu_ratings_item_category: "Category for rating items, usually a subcategory of the rating board category. The plugin creates the topics after approval, so regular users only need permission to reply here."
+    kuu_ratings_placeholder_image: "Image used in the rating board cards of topic lists for items without a picture (square, at least 400×400). A grey icon is shown when it is not set."
   kuu_ratings:
     board_first_post: "This is a rating board. Its items are listed below the title."
     errors:

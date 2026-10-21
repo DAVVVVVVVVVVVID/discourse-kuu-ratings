@@ -22,6 +22,8 @@ zh_CN:
       new_topic_choice:
         board: "评分主题"
         board_description: "列出几个对象，让大家打分和点评"
+      board_card:
+        more: "查看更多"
       board_form:
         title: "新建评分主题"
         name: "评分主题名称"

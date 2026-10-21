@@ -122,6 +122,25 @@ after_initialize do
   on(:post_created) { |post| DiscourseKuuRatings::ReviewThreads.assign_root(post) }
   on(:approved_post) { |_reviewable, post| DiscourseKuuRatings::ReviewThreads.assign_root(post) }
 
+  # 帖子列表里评分主题显示成「标题 + 一排评分对象」卡片（Issue #4）。一页列表的评分主题一次查完
+  add_to_class(:topic, :kuu_board_card) { @kuu_board_card }
+  add_to_class(:topic, :kuu_board_card=) { |card| @kuu_board_card = card }
+
+  TopicList.on_preload do |topics, topic_list|
+    DiscourseKuuRatings::BoardCards.preload(topics, Guardian.new(topic_list.current_user))
+  end
+
+  # 帖子底部的推荐用的是 SuggestedTopicSerializer，不是 TopicListItemSerializer，两个都要加
+  %i[topic_list_item suggested_topic].each do |serializer|
+    add_to_serializer(
+      serializer,
+      :kuu_rating_board_card,
+      include_condition: -> do
+        DiscourseKuuRatings::BoardCards.board?(object) && kuu_rating_board_card.present?
+      end,
+    ) { @kuu_rating_board_card ||= DiscourseKuuRatings::BoardCards.serialized_card(object, scope) }
+  end
+
   TopicQuery.add_custom_filter(:kuu_ratings_hide_items) do |results, topic_query|
     DiscourseKuuRatings::TopicListFilter.call(results, topic_query)
   end

@@ -738,3 +738,172 @@ body.kuu-item-topic .topic-footer-main-buttons .create {
     margin-left: 0;
   }
 }
+
+// 帖子列表里的评分主题卡片（Issue #4）：标题下面一排评分对象，最右边「查看更多」。
+// 卡片取代了 FKB Pro 卡片的上中下三块（分类和作者、摘要、浏览和回复数）；没装 FKB Pro 时这几条不起作用。
+// 主题的样式表在插件之后加载，选择器要比 FKB Pro 的（.topic-list .main-link .tli-top-section）更具体
+.topic-list .topic-list-item.kuu-rating-board .main-link {
+  .tli-top-section,
+  .tli-middle-section,
+  .tli-bottom-section {
+    display: none;
+  }
+
+  // 一排对象放在标题那一行里（topic-list-after-title），让它单独换行
+  .link-top-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 var(--space-1);
+  }
+
+  a.title.raw-topic-link::after {
+    content: "\203A";
+    margin-left: var(--space-1);
+    color: var(--primary-medium);
+  }
+}
+
+// 圆角用固定值：FKB Pro 里 --d-default-border-radius 是 1em，卡片字号一大圆角就很夸张
+$kuu-board-card-radius: 8px;
+
+.kuu-board-card {
+  // 一个对象的宽度（也是图片的边长），「查看更多」竖条和图片一样高。
+  // 电脑上 4 个对象加「查看更多」放得下一行，手机上左右滑动
+  --kuu-board-card-item: 6rem;
+
+  // 帖子列表是表格，单元格会按内容撑宽。宽度设成 0、最小宽度占满，这一排就不参与撑宽，
+  // 放不下时在卡片里左右滑动，而不是把整个页面撑宽
+  flex: 1 1 100%;
+  width: 0;
+  min-width: 100%;
+  margin-top: var(--space-2);
+
+  &__items {
+    display: flex;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0 0 var(--space-1);
+    overflow-x: auto;
+    list-style: none;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  &__item {
+    flex: 0 0 var(--kuu-board-card-item);
+    min-width: 0;
+    scroll-snap-align: start;
+
+    &.--more {
+      flex-basis: 3rem;
+    }
+  }
+
+  &__link {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    color: var(--primary);
+    font-size: var(--font-down-1);
+    font-weight: normal;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--primary);
+
+      .kuu-board-card__name {
+        color: var(--tertiary);
+      }
+    }
+  }
+
+  // 图片绝对定位铺满方框：iPhone Safari 上 flex 里的图片按 aspect-ratio 算不对，会只显示一角
+  &__image {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding-top: 100%;
+    overflow: hidden;
+    border-radius: $kuu-board-card-radius;
+    background: var(--primary-very-low);
+    color: var(--primary-low-mid);
+
+    img,
+    .d-icon {
+      position: absolute;
+      inset: 0;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .d-icon {
+      width: 40%;
+      height: 40%;
+      margin: auto;
+    }
+  }
+
+  // 名字最多两行，再长才截断
+  &__name {
+    display: -webkit-box;
+    overflow: hidden;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  &__score {
+    display: inline-flex;
+    gap: 0.2em;
+    align-items: center;
+    font-weight: bold;
+
+    .d-icon {
+      color: var(--kuu-star-color);
+    }
+
+    &.--none {
+      color: var(--primary-medium);
+      font-weight: normal;
+    }
+  }
+
+  // 「查看更多」：和图片一样高的竖条，文字每行两个字（「查看」「更多」）
+  &__more {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: var(--kuu-board-card-item);
+    padding: var(--space-1);
+    box-sizing: border-box;
+    border-radius: $kuu-board-card-radius;
+    background: var(--primary-very-low);
+    color: var(--primary-high);
+    font-size: var(--font-down-1);
+    line-height: 1.3;
+    text-align: center;
+
+    .kuu-board-card__more-text {
+      max-width: 2em;
+    }
+
+    &:hover,
+    &:focus-visible {
+      background: var(--tertiary-very-low);
+      color: var(--tertiary);
+    }
+  }
+}
+
+html.mobile-view .kuu-board-card {
+  --kuu-board-card-item: 5.5rem;
+}

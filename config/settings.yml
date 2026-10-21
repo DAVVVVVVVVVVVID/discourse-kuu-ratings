@@ -10,3 +10,7 @@ discourse_kuu_ratings:
     type: category
     default: ""
     client: true
+  kuu_ratings_placeholder_image:
+    type: upload
+    default: ""
+    client: true
