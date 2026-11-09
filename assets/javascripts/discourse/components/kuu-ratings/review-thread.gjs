@@ -50,6 +50,7 @@ export default class ReviewThread extends Component {
   });
 
   #scrollTimer;
+  #linkedReplyPostNumber;
 
   get post() {
     return this.args.outletArgs.post;
@@ -181,11 +182,25 @@ export default class ReviewThread extends Component {
       return;
     }
 
+    // modifier 会随回复列表更新重跑，同一目标只自动加载一次。
+    if (
+      this.#linkedReplyPostNumber === postNumber &&
+      !this.replies.some((reply) => reply.post_number === postNumber)
+    ) {
+      return;
+    }
+    this.#linkedReplyPostNumber = postNumber;
+
     while (
       this.hasMore &&
       !this.replies.some((reply) => reply.post_number === postNumber)
     ) {
+      const previousReplyCount = this.replies.length;
       await this.loadMore();
+      // 请求失败或返回空页、重复回复时停止，保留按钮供用户手动重试。
+      if (this.replies.length <= previousReplyCount) {
+        return;
+      }
     }
 
     this.highlightedPostNumber = postNumber;

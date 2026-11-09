@@ -41,6 +41,29 @@ RSpec.describe "Reply in review thread" do
     Array.new(count) { |index| kuu_reply_to(review, user: replier, raw: "Reply number #{index}") }
   end
 
+  def with_first_reply_page(review, body:, status: 200)
+    requests = []
+    pattern = %r{/kuu-ratings/reviews/#{review.id}/replies\.json}
+
+    page.driver.with_playwright_page do |browser_page|
+      browser_page.route(
+        pattern,
+        lambda do |route, request|
+          requests << request.url
+          if requests.size == 1
+            route.fulfill(status:, contentType: "application/json", body: body.to_json)
+          else
+            route.continue
+          end
+        end,
+      )
+
+      yield requests
+    ensure
+      browser_page.unroute(pattern)
+    end
+  end
+
   context "when logged in" do
     before { sign_in(user) }
 
@@ -160,12 +183,67 @@ RSpec.describe "Reply in review thread" do
 
     it "takes the user to a linked reply inside its thread" do
       review = add_review
-      replies = add_replies(review, 6)
+      replies = add_replies(review, 16)
 
-      item_page.visit_post(replies[4])
+      item_page.visit_post(replies[14])
 
-      expect(item_page.review_thread(review)).to have_highlighted_reply(replies[4])
-      expect(item_page.review_thread(review)).to have_reply_count(6)
+      expect(item_page.review_thread(review)).to have_highlighted_reply(replies[14])
+      expect(item_page.review_thread(review)).to have_reply_count(16)
+    end
+
+    context "when loading a linked reply makes no progress" do
+      let!(:review) { add_review }
+      let!(:replies) { add_replies(review, 6) }
+      let(:response_status) { 200 }
+      let(:response_body) { { replies: [], reply_count: replies.size } }
+
+      shared_examples "manual retry after loading stops" do
+        it "keeps the preview and lets the user retry without automatically requesting again" do
+          thread = item_page.review_thread(review)
+
+          with_first_reply_page(review, body: response_body, status: response_status) do |requests|
+            item_page.visit_post(replies[4])
+
+            if response_status != 200
+              expect(dialog).to have_content("Replies are temporarily unavailable")
+              dialog.click_ok
+            end
+
+            expect(thread).to have_replies(*replies.first(3))
+            expect(thread).to have_view_all_button(6)
+            expect(requests.size).to eq(1)
+
+            thread.click_more
+
+            expect(thread).to have_replies(*replies)
+            expect(thread).to have_no_more_button
+            expect(requests.size).to eq(2)
+          end
+        end
+      end
+
+      context "when the request fails" do
+        let(:response_status) { 503 }
+        let(:response_body) { { errors: ["Replies are temporarily unavailable"] } }
+
+        include_examples "manual retry after loading stops"
+      end
+
+      context "when the server returns an empty page" do
+        include_examples "manual retry after loading stops"
+      end
+
+      context "when the server returns replies already in the preview" do
+        let(:response_body) do
+          DiscourseKuuRatings::ReviewThreadBatch.new(
+            item_topic_id: item_topic.id,
+            root_ids: [review.id],
+            guardian: Guardian.new(user),
+          ).thread_json(review.id)
+        end
+
+        include_examples "manual retry after loading stops"
+      end
     end
 
     it "shows the user how many replies each hot review has" do
